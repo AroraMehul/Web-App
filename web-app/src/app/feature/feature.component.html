@@ -1,0 +1,63 @@
+<!-- Form for Feature Screen -->
+<div class="container">
+    <mat-card>
+        <form [formGroup] = "featureForm" #formDir="ngForm">
+        <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+          <mat-form-field fxFlex="48%">
+            <mat-label for="feature">Feature</mat-label>
+            <input type="text" matInput [(ngModel)] = "featureObject.feature" name="feature" id="feature" formControlName="feature" required ng-disabled="true">
+          </mat-form-field>
+
+          <span fxFlex="48%" fxHide.lt-md></span>
+
+          <mat-form-field fxFlex="48%">
+            <mat-label for="valueType">Value Type</mat-label>
+            <mat-select [(ngModel)] = "featureObject.valueType"  name="valueType" id="valueType" formControlName="valueType" required>
+              <mat-option *ngFor="let value of valueData" [value]="value">
+                {{ value }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <span fxFlex="48%" fxHide.lt-md></span>
+
+          <mat-form-field fxFlex="48%">
+            <mat-label for="dataType">Data Type</mat-label>
+            <mat-select [(ngModel)] = "featureObject.dataType"  name="dataType" id="dataType" formControlName="dataType" required>
+              <mat-option *ngFor="let data of dataData" [value]="data">
+                {{ data }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <span fxFlex="48%" fxHide.lt-md></span>
+
+          <mat-form-field fxFlex="48%">
+            <mat-label for="category">Category</mat-label>
+            <mat-select [(ngModel)] = "featureObject.category" name="category" id="category" formControlName="category" required>
+              <mat-option *ngFor="let category of categoryData" [value]="category">
+                {{ category }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <span fxFlex="48%" fxHide.lt-md></span>
+
+          <div fxFlex="18%">
+            <mat-checkbox labelPosition="before" [(ngModel)] = "featureObject.status"  name="status" id="status" formControlName="status">Status</mat-checkbox>
+          </div>
+
+        </div>
+        <div *ngIf="errorMsg" class="error-msg">
+          {{ errorMsg }}
+        </div>
+        <mat-card-actions fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="5px">
+          <button mat-raised-button color="accent" >Get</button>
+          <button type="button" mat-raised-button >Cancel</button>
+          <button mat-raised-button color="primary"  (click)="submitFeature()" [disabled]="featureForm.invalid">Submit</button>
+        </mat-card-actions>
+
+    </form>
+    </mat-card>
+
+  </div>

@@ -1,0 +1,87 @@
+/** Angular Imports */
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule, HttpRequest } from '@angular/common/http';
+import { ServiceWorkerModule } from '@angular/service-worker';
+
+/** Tanslation Imports */
+import { TranslateModule } from '@ngx-translate/core';
+
+/** Chart Imports */
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+
+/** Environment Configuration */
+import { environment } from 'environments/environment';
+
+/** Main Component */
+import { WebAppComponent } from './web-app.component';
+
+/** Not Found Component */
+import { NotFoundComponent } from './not-found/not-found.component';
+
+/** Custom Modules */
+import { CoreModule } from './core/core.module';
+import { HomeModule } from './home/home.module';
+import { LoginModule } from './login/login.module';
+import { SettingsModule } from './settings/settings.module';
+import { NavigationModule } from './navigation/navigation.module';
+import { ClientsModule } from './clients/clients.module';
+import { GroupsModule } from './groups/groups.module';
+import { CentersModule } from './centers/centers.module';
+import { AccountingModule } from './accounting/accounting.module';
+import { SelfServiceModule } from './self-service/self-service.module';
+import { SystemModule } from './system/system.module';
+import { ProductsModule } from './products/products.module';
+import { FeatureModule } from './feature/feature.module';
+import { FeaturedetailsModule } from './featuredetails/featuredetails.module';
+import { ConfigurationModule } from './configuration/configuration.module';
+import { ConfigurationdetailsModule } from './configurationdetails/configurationdetails.module';
+import { CriteriaModule } from './criteria/criteria.module';
+import { CriteriadetailsModule } from './criteriadetails/criteriadetails.module';
+import { ScorecardModule } from './scorecard/scorecard.module';
+
+
+/** Main Routing Module */
+import { AppRoutingModule } from './app-routing.module';
+import { HttpRequestService } from './shared/HttpRequestService';
+
+/**
+ * App Module
+ *
+ * Core module and all feature modules should be imported here in proper order.
+ */
+@NgModule({
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    ServiceWorkerModule.register('./ngsw-worker.js', { enabled: environment.production }),
+    TranslateModule.forRoot(),
+    NgxChartsModule,
+    CoreModule,
+    HomeModule,
+    LoginModule,
+    SettingsModule,
+    NavigationModule,
+    FeatureModule,
+    FeaturedetailsModule,
+    ConfigurationModule,
+    ConfigurationdetailsModule,
+    CriteriaModule,
+    CriteriadetailsModule,
+    ScorecardModule,
+    ClientsModule,
+    GroupsModule,
+    CentersModule,
+    AccountingModule,
+    SelfServiceModule,
+    SystemModule,
+    ProductsModule,
+    AppRoutingModule
+  ],
+  declarations: [WebAppComponent, NotFoundComponent],
+  providers: [HttpRequestService],
+  bootstrap: [WebAppComponent]
+})
+export class AppModule { }

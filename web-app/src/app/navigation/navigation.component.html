@@ -1,0 +1,53 @@
+<div class="container">
+
+  <!-- <p>
+    TODO: navigation component.
+  </p> -->
+  
+  <mat-card>
+  <form>
+      <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+        <mat-form-field fxFlex="48%">
+          <mat-label>Feature</mat-label>
+          <input type="text" matInput>
+        </mat-form-field>
+
+        <span fxFlex="48%" fxHide.lt-md></span>
+
+        <mat-form-field fxFlex="48%">
+          <mat-label>Value Type</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let value of valueData" [value]="value">
+              {{ value }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <span fxFlex="48%" fxHide.lt-md></span>
+
+        <mat-form-field fxFlex="48%">
+          <mat-label>Data Type</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let gender of genderData" [value]="gender">
+              {{ gender }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <span fxFlex="48%" fxHide.lt-md></span>
+
+        <mat-form-field fxFlex="48%">
+          <mat-label>Value Type</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let value of valueData" [value]="value">
+              {{ value }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+
+      </div> 
+  </form>
+  </mat-card>
+
+</div>

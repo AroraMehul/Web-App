@@ -1,0 +1,175 @@
+<div class="container">
+
+  <!-- <p>
+      TODO: navigation component.
+    </p> -->
+
+  <mat-card>
+    <form>
+      <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+
+        <mat-form-field fxFlex="24%">
+          <mat-label>Feature</mat-label>
+          <mat-select [(ngModel)]="configurationObj.feature" name="feature" (selectionChange)="onFeatureSelection()">
+            <mat-option *ngFor="let feat of featureData" [value]="feat.feature">
+              {{ feat.feature }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <span fxFlex="4%" fxHide.lt-md></span>
+
+        <mat-form-field fxFlex="24%">
+          <mat-label>Category</mat-label>
+          <input matInput [(ngModel)]="configurationObj.category" name="category" disabled="true">
+          <!-- <mat-select [(ngModel)] = "configurationObj.category" name="category">
+              <mat-option *ngFor="let category of categoryData" [value]="category">
+                {{ category }}
+              </mat-option>
+            </mat-select> -->
+        </mat-form-field>
+
+        <span fxFlex="4%" fxHide.lt-md></span>
+
+        <mat-form-field fxFlex="24%">
+          <mat-label>Product</mat-label>
+          <mat-select [(ngModel)]="configurationObj.product" name="product">
+            <mat-option *ngFor="let product of productData" [value]="product">
+              {{ product }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+
+        <span fxFlex="88%" fxHide.lt-md></span>
+        <div style="margin-right: 2%;width: 78%;">
+          <div>
+            <mat-form-field fxFlex="28%">
+              <mat-label>Weightage</mat-label>
+              <input type="text" matInput [(ngModel)]="configurationObj.weightage" name="weightage">
+            </mat-form-field>
+            * Range : 0.0 - 1.0(Default is 0)
+          </div>
+          <div class="error-msg" *ngIf="checkweightage">
+            Value should be only numbers and between 0.0 to 1.0
+          </div>
+        </div>
+
+
+
+
+        <span fxHide.lt-md></span>
+
+        <mat-form-field fxFlex="18%">
+          <mat-label>Colour</mat-label>
+          <mat-select [(ngModel)]="configurationObj.colour1" name="colour1">
+            <mat-option *ngFor="let colour1 of colour1Data" [value]="colour1">
+              {{ colour1 }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="20%">
+          <mat-label>Score Range(min.)</mat-label>
+          <mat-select [(ngModel)]="configurationObj.greenmin" name="greenmin" (selectionChange)="onGreenMinSelection()"
+            matNativeControl required [formControl]="greenFormControl">
+            <mat-option *ngFor="let min of minGreen" [value]="min">
+              {{ min }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="greenFormControl.invalid && greenFormControl.hasError('required')">Field is required
+          </mat-error>
+          <mat-error *ngIf="!checkGreenMin() && !greenFormControl.hasError('required')">Max should be more than min
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="20%">
+          <mat-label>Score Range(max.)</mat-label>
+          <mat-select [(ngModel)]="configurationObj.greenmax" name="greenmax" (selectionChange)="onGreenMaxSelection()"
+            matNativeControl required [formControl]="greenMaxFormControl">
+            <mat-option *ngFor="let max of maxGreen" [value]="max">
+              {{ max }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="greenMaxFormControl.invalid && greenMaxFormControl.hasError('required')">Field is required
+          </mat-error>
+          <mat-error *ngIf="!checkGreenMin() && !greenMaxFormControl.hasError('required')">Max should be more than min
+          </mat-error>
+        </mat-form-field>
+
+        <span fxFlex="88%" fxHide.lt-md></span>
+
+        <mat-form-field fxFlex="18%">
+          <mat-label>Colour</mat-label>
+          <mat-select [(ngModel)]="configurationObj.colour2" name="colour2">
+            <mat-option *ngFor="let colour2 of colour2Data" [value]="colour2">
+              {{ colour2 }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="20%">
+          <mat-label>Score Range(min.)</mat-label>
+          <mat-select [(ngModel)]="configurationObj.ambermin" name="ambermin" (selectionChange)="onAmberMinSelection()">
+            <mat-option *ngFor="let min of minAmber" [value]="min">
+              {{ min }}
+            </mat-option>
+          </mat-select>
+
+        </mat-form-field>
+
+        <mat-form-field fxFlex="20%">
+          <mat-label>Score Range(max.)</mat-label>
+          <mat-select [(ngModel)]="configurationObj.ambermax" name="ambermax" (selectionChange)="onAmberMaxSelection()">
+            <mat-option *ngFor="let max of maxAmber" [value]="max">
+              {{ max }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <span fxFlex="88%" fxHide.lt-md></span>
+
+        <mat-form-field fxFlex="18%">
+          <mat-label>Colour</mat-label>
+          <mat-select [(ngModel)]="configurationObj.colour3" name="colour3">
+            <mat-option *ngFor="let colour3 of colour3Data" [value]="colour3">
+              {{ colour3 }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="20%">
+          <mat-label>Score Range(min.)</mat-label>
+          <mat-select [(ngModel)]="configurationObj.redmin" name="redmin" (selectionChange)="onRedMinSelection()">
+            <mat-option *ngFor="let min of minRed" [value]="min">
+              {{ min }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field fxFlex="20%">
+          <mat-label>Score Range(max.)</mat-label>
+          <mat-select [(ngModel)]="configurationObj.redmax" name="redmax" (selectionChange)="onRedMaxSelection()">
+            <mat-option *ngFor="let max of maxRed" [value]="max">
+              {{ max }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+
+
+      </div>
+      <div *ngIf="errorMsg" class="error-msg">
+        {{ errorMsg }}
+      </div>
+      <mat-card-actions fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="5px">
+        <!-- Here GET used for getting Configuration Detials Page -->
+        <button mat-raised-button color="accent" [routerLink]="['/configurationdetails']">Get</button>
+        <button type="button" mat-raised-button [routerLink]="['../']">Cancel</button>
+        <button mat-raised-button color="primary" (click)="submitFeature()">Submit</button>
+      </mat-card-actions>
+
+    </form>
+  </mat-card>
+
+</div>

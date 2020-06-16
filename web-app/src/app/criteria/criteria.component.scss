@@ -1,0 +1,35 @@
+table {
+    width: 50%;
+}
+
+
+button {
+    margin: 16px 8px;
+}
+.mat-table {
+  overflow: auto;
+  max-height: 500px;
+}
+.rowstyle{
+  display: inline;
+}
+
+.columnssm4{
+  width: 16%;
+  font-size: medium;
+  font-weight: 800;  // display: contents;
+}
+
+.error-width{
+  width: 20%;
+  margin-right: 87px;
+}
+
+.error-msg{
+  width: 16%;
+}
+
+.errormsg{
+  display: flex;
+    color: red;
+}
