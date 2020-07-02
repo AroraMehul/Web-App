@@ -9,6 +9,7 @@ from sklearn.utils import shuffle
 from scipy.stats import norm
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline 
+from statsmodels.multivariate.manova import MANOVA
 
 def var(df, scorecolor):
 
@@ -64,7 +65,7 @@ def linear_regression(input_row, scorecolor):
 	  if(col not in categorical):
 	    data[col] = (data[col] - np.mean(data[col]))/np.std(data[col])
 
-	split = 0.7
+	split = 0.8
 	split_idx = int(len(data)*split)
 	data_train = data[:split_idx]
 	data_test = data[split_idx:]
@@ -89,7 +90,7 @@ def linear_regression(input_row, scorecolor):
 		if(y_test[i] == predictions[i]):
 			count = count + 1
 	accuracy = count/len(predictions)
-
+	print(accuracy)
 	for criteria in scorecolor:
 		mini, maxi = criteria.split("-")
 		if(accuracy*100 > int(mini) and accuracy*100 < int(maxi)):
@@ -168,13 +169,16 @@ def polynomial_regression(input_row, scorecolor):
 
 	return "Green"
 
-def manova(data, scorecolor):
-	url = '/content/datasets_9109_12699_german_credit_data.csv'
+def manova(test_row, scorecolor):
+
+	url = "/home/mehul/Downloads/datasets_9109_12699_german_credit_data.csv"
 	data = pd.read_csv(url, index_col=0)
 	data.columns = data.columns.str.replace(" ", "_")
 
 	data.columns = data.columns.str.replace(" ", "_")
 	data = data.dropna()
+
+	data.append(test_row, sort=False)
 
 	categorical = ['Sex', 'Housing', 'Saving_accounts', 'Checking_account', 'Purpose', 'Risk']
 	le = LabelEncoder()
@@ -186,32 +190,73 @@ def manova(data, scorecolor):
 	  if(col not in categorical):
 	    data[col] = (data[col] - np.mean(data[col]))/np.std(data[col])
 
-	x = data.loc[:, data.columns != 'Risk']
-	y = data['Risk']
+	test_row = data.iloc[len(data)-1]
+	data.drop([len(data)-1])
 
-	manova = MANOVA(endog=x, exog=y)
+	data_good = data[data['Risk'] == 0]
+	data_bad = data[data['Risk'] == 1]
 
-	print(manova.mv_test())
+	x_good = data_good.drop(['Risk', 'Credit_amount'], axis = 1)
+	y_good = data_good[['Credit_amount']]
+	x_bad = data_bad.drop(['Risk', 'Credit_amount'], axis = 1)
+	y_bad = data_bad[['Credit_amount']]
 
-	output = manova.mv_test()
+	man_good = MANOVA(endog=x_good, exog=y_good)
+	man_bad = MANOVA(endog=x_bad, exog=y_bad)
 
-	out = np.array(output['x0']['stat'])
+	output_good = man_good.mv_test()
+	output_bad = man_bad.mv_test()
 
-	WL = out[0][0]
-	PT = out[1][0]
-	HT = out[2][0]
-	RGR = out[3][0]
+	out_good = np.array(output_good['x0']['stat'])
+	out_bad = np.array(output_bad['x0']['stat'])
 
-	for criteria in scorecolor:
-		mini, maxi = criteria.split("-")
-		if(WL > int(mini) and WL < int(maxi)):
-			return WL, scorecolor[criteria]
+	WL_good = out_good[0][0]
+	PT_good = out_good[1][0]
+	HT_good = out_good[2][0]
+	RGR_good = out_good[3][0]
 
-	WL, PT, HT, RGR
+	WL_bad = out_bad[0][0]
+	PT_bad = out_bad[1][0]
+	HT_bad = out_bad[2][0]
+	RGR_bad = out_bad[3][0]
+
+	x = test_row.drop(['Risk', 'Credit_amount'])
+	y = test_row[['Credit_amount']]
+
+	data_test_x = x_good.append(x)
+	data_test_y = y_good.append(y)
+
+	man_test = MANOVA(endog=data_test_x, exog=data_test_y)
+	output_test = man_test.mv_test()
+
+	out_test = np.array(output_test['x0']['stat'])
+
+	WL_test_good = out_test[0][0]
+	PT_test_good = out_test[1][0]
+	HT_test_good = out_test[2][0]
+	RGR_test_good = out_test[3][0]
+
+	data_test_x = x_bad.append(x)
+	data_test_y = y_bad.append(y)
+
+	man_test = MANOVA(endog=data_test_x, exog=data_test_y)
+	output_test = man_test.mv_test()
+
+	out_test = np.array(output_test['x0']['stat'])
+
+	WL_test_bad = out_test[0][0]
+	PT_test_bad = out_test[1][0]
+	HT_test_bad = out_test[2][0]
+	RGR_test_bad = out_test[3][0]
+
+	ret = "WL good : " + str(WL_good) + " WL test good : " + str(WL_test_good) + "\nWL bad : " + str(WL_bad) + " WL test bad : " + str(WL_test_bad)
+
+	return ret
 
 
 def stat_score(loan_id, details):
 	print("Entered stat_score")
+	#try :
 	loan_details = details[str(loan_id)]
 	data = pd.DataFrame(loan_details['values'], index=[0])
 	scorecolor = loan_details['color']
@@ -229,6 +274,8 @@ def stat_score(loan_id, details):
 		output = polynomial_regression(data, scorecolor)
 
 	print(output)
+	#except Exception as e :
+	#	print(e)
 
 
 print("Enter Loan Id")
