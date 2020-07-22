@@ -94,5 +94,43 @@ export class ScoreCardService {
     );
   }
 
+  public getStatScore(statsuccesscallback, loan_id){
+
+    let responseObject: any;
+    let payload = {
+      loan_id
+    }
+    this._httpService.postRequest(Config.getEnvironmentVariable("getStatScore"), payload).subscribe(
+      (data) => {
+        responseObject = data;
+        statsuccesscallback(responseObject);
+      },
+      (error) => console.log(error),
+      () => {
+        console.log("success ");
+      }
+    );
+
+  }
+
+  public getMLScore(mlsuccesscallback, loan_id){
+
+    let responseObject: any;
+    let payload = {
+      loan_id
+    }
+    this._httpService.postRequest(Config.getEnvironmentVariable("getMLScore"), payload).subscribe(
+      (data) => {
+        responseObject = data;
+        mlsuccesscallback(responseObject);
+      },
+      (error) => console.log(error),
+      () => {
+        console.log("success ");
+      }
+    );
+
+  }
+
 
 }

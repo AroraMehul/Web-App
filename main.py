@@ -13,6 +13,8 @@ from scorecard_backend.views.CriteriaOperations import getAllCriteriaFromDB, get
 from scorecard_backend.views.FeatureOperations import getByFeatureId, getAllFeaturesFromDB, getFeatureNCategoryFromDB, \
     saveAFeature
 from scorecard_backend.views.ScorecardOperations import getByAge, getByGender, getByJSON, getByXML
+from ML_models.Strategy import getMLScore
+from statistical_scripts.statistical_scoring import stat_score 
 
 
 app = Flask(__name__)
@@ -110,6 +112,20 @@ def saveTheCriteria():
     # print(request.json['id'])
     # values = (data['feature'],data['value'],data['data'],data['category'],data['status'])
     return saveCriteria(data['id'],data['feature'],data['category'],data['product'],data['datasource'],data['keyvalue'], data['sqlapi'], data['scoreCriteria'])
+
+@app.route('/score/calc/ml', methods=['POST'])
+def getScoreML():
+    scorecard = getMLScore(request.json['loan_id']);
+    return jsonify(
+        scorecard=scorecard
+    )
+
+@app.route('/score/calc/stat', methods=['POST'])
+def getScoreStat():
+    scorecard = stat_score(request.json['loan_id']);
+    return jsonify(
+        scorecard=scorecard
+    )
 
 # main driver function
 if __name__ == '__main__':

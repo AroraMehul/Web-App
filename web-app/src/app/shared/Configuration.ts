@@ -24,7 +24,9 @@ const SERVICE_URLS_MAP = {
     getFeatureCatgory: 'feature/featureNCategory',
     getScore: 'score/calc',
     getJsonScore: 'score/calc/json',
-    getXmlScore: 'score/calc/xml'
+    getXmlScore: 'score/calc/xml',
+    getStatScore: 'score/calc/stat',
+    getMLScore: 'score/calc/ml'
 
 };
 

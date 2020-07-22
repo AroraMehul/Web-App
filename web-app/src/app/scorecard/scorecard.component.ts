@@ -18,6 +18,7 @@ export class ScorecardComponent implements OnInit {
   public dataSource = [];
   columnsToDisplay: string[] = this.displayedColumns.slice();
   totalScore = 0;
+  modelType: string = "criteria";
 
   public scorecardObj = {
     age: [],
@@ -39,7 +40,6 @@ export class ScorecardComponent implements OnInit {
   constructor(private _scoreCardService: ScoreCardService, private router: Router, private route: ActivatedRoute) {}
   ngOnInit() {
     this.getLoans();
-
   }
 
   public getLoans() {
@@ -56,100 +56,123 @@ export class ScorecardComponent implements OnInit {
     this._scoreCardService.getLoan(successcallback);
   }
 
+  public getStatisticalScoring(){
+    const statsuccesscallback = (data) => {
+      console.log(data);
+    }
+    this._scoreCardService.getStatScore(statsuccesscallback, this.loanId)
+  }
+
+  public getMLScoring(){
+    const mlsuccesscallback = (data) => {
+      console.log(data);
+    }
+    this._scoreCardService.getMLScore(mlsuccesscallback, this.loanId)
+  }
+
   public getClientDetails() {
-    this.errorFlag = false;
-    this.colorgreen = false;
-    this.coloramber = false;
-    this.colorred = false;
-this.colorgreen = true;
-    if (!this.loanId) {
-      this.errorFlag = true;
-    } else {
-      let clientId = null;
+    console.log(this.modelType);
+    if(this.modelType == "statistical"){
+      this.getStatisticalScoring();
+    }
+    if(this.modelType == "machine-learning"){
+      this.getMLScoring();
+    }
+    if(this.modelType == "criteria"){
+      this.errorFlag = false;
+      this.colorgreen = false;
+      this.coloramber = false;
+      this.colorred = false;
+      this.colorgreen = true;
+      if (!this.loanId) {
+        this.errorFlag = true;
+      } else {
+        let clientId = null;
 
-      for (let loan of this.loanValues) {
-        if (loan.id === +this.loanId) {
-          clientId = loan.clientId;
-          break;
+        for (let loan of this.loanValues) {
+          if (loan.id === +this.loanId) {
+            clientId = loan.clientId;
+            break;
+          }
         }
-      }
-      if (clientId) {
-        const successcallback = (data) => {
-          let dob = data["dateOfBirth"];
-          let gender = data["gender"];
+        if (clientId) {
+          const successcallback = (data) => {
+            let dob = data["dateOfBirth"];
+            let gender = data["gender"];
 
-          console.log(dob);
-          console.log(gender);
-          let age = 0;
-          let gen = "";
-          if (dob) {
-            age = new Date().getFullYear() - dob[0];
-          }
-          if (gender) {
-            gen = gender["name"].toUpperCase();
-          }
-          console.log("GENDER", gen)
-          const successcallbackGen = (datagen) => {
-            let res = [];
-            console.log(datagen["genderScore"])
-            this.totalScore = Number(datagen["ageScore"]) + Number(datagen["genderScore"]);
-            res.push({
-              Category: "Individual",
-              Feature: " Age",
-              Score: datagen["ageScore"],
-              Color: datagen["ageColor"]
-            });
-            res.push({
-              Category: "Individual",
-              Feature: " Gender",
-              Score: datagen["genderScore"],
-              Color: datagen["genderColor"]
-            });
-
-            let xmlsuccesscallback = (valueData) => {
-              //data = JSON.parse(valueData)
-              console.log(valueData['scorecard']['color'][0]);
-              var count = 0;
-              for(var i = 0; i < valueData['scorecard']['color'].length ; i++){
-                count = count + Number(valueData['scorecard']['score'][i])
-                res.push({
-                Category: valueData['scorecard']['category'][i],
-                Feature: valueData['scorecard']['feature'][i],
-                Score: valueData['scorecard']['score'][i],
-                Color: valueData['scorecard']['color'][i]
-                });
-              }
-
-              //this.dataSource = res;
-              this.totalScore = this.totalScore + count;
-              //console.log("json string", JSON.stringify(valueData), valueData);
+            console.log(dob);
+            console.log(gender);
+            let age = 0;
+            let gen = "";
+            if (dob) {
+              age = new Date().getFullYear() - dob[0];
             }
-            
-            let jsonsuccesscallback = (valueData) => {
-              //data = JSON.parse(valueData)
-              console.log(valueData['scorecard']['color'][0]);
-              var count = 0;
-              for(var i = 0; i < valueData['scorecard']['color'].length ; i++){
-                count = count + Number(valueData['scorecard']['score'][i])
-                res.push({
-                Category: valueData['scorecard']['category'][i],
-                Feature: valueData['scorecard']['feature'][i],
-                Score: valueData['scorecard']['score'][i],
-                Color: valueData['scorecard']['color'][i]
-                });
-              }
-
-              this.dataSource = res;
-              this.totalScore = this.totalScore + count;
-              //console.log("json string", JSON.stringify(valueData), valueData);
+            if (gender) {
+              gen = gender["name"].toUpperCase();
             }
-            this._scoreCardService.getXmlScore(xmlsuccesscallback, this.loanId);
-            this._scoreCardService.getJsonScore(jsonsuccesscallback, this.loanId);
+            console.log("GENDER", gen)
+            const successcallbackGen = (datagen) => {
+              let res = [];
+              console.log(datagen["genderScore"])
+              this.totalScore = Number(datagen["ageScore"]) + Number(datagen["genderScore"]);
+              res.push({
+                Category: "Individual",
+                Feature: " Age",
+                Score: datagen["ageScore"],
+                Color: datagen["ageColor"]
+              });
+              res.push({
+                Category: "Individual",
+                Feature: " Gender",
+                Score: datagen["genderScore"],
+                Color: datagen["genderColor"]
+              });
+
+              let xmlsuccesscallback = (valueData) => {
+                //data = JSON.parse(valueData)
+                console.log(valueData['scorecard']['color'][0]);
+                var count = 0;
+                for(var i = 0; i < valueData['scorecard']['color'].length ; i++){
+                  count = count + Number(valueData['scorecard']['score'][i])
+                  res.push({
+                  Category: valueData['scorecard']['category'][i],
+                  Feature: valueData['scorecard']['feature'][i],
+                  Score: valueData['scorecard']['score'][i],
+                  Color: valueData['scorecard']['color'][i]
+                  });
+                }
+
+                //this.dataSource = res;
+                this.totalScore = this.totalScore + count;
+                //console.log("json string", JSON.stringify(valueData), valueData);
+              }
+              
+              let jsonsuccesscallback = (valueData) => {
+                //data = JSON.parse(valueData)
+                console.log(valueData['scorecard']['color'][0]);
+                var count = 0;
+                for(var i = 0; i < valueData['scorecard']['color'].length ; i++){
+                  count = count + Number(valueData['scorecard']['score'][i])
+                  res.push({
+                  Category: valueData['scorecard']['category'][i],
+                  Feature: valueData['scorecard']['feature'][i],
+                  Score: valueData['scorecard']['score'][i],
+                  Color: valueData['scorecard']['color'][i]
+                  });
+                }
+
+                this.dataSource = res;
+                this.totalScore = this.totalScore + count;
+                //console.log("json string", JSON.stringify(valueData), valueData);
+              }
+              this._scoreCardService.getXmlScore(xmlsuccesscallback, this.loanId);
+              this._scoreCardService.getJsonScore(jsonsuccesscallback, this.loanId);
+            };
+
+            this._scoreCardService.getAllScore(successcallbackGen, age, gen);
           };
-
-          this._scoreCardService.getAllScore(successcallbackGen, age, gen);
-        };
-        this._scoreCardService.getClientDetails(successcallback, clientId);
+          this._scoreCardService.getClientDetails(successcallback, clientId);
+        }
       }
     }
   }

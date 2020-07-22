@@ -10,27 +10,25 @@
             <div *ngIf="errorFlag" class="errormsg">
 Provide the details to fetch
             </div>
-            <div>
-              <button mat-raised-button color="primary"  (click)="getClientDetails()">Fetch Details</button>
-
-            </div>
+            
             <div>
               Overall Score: <span>{{totalScore}}</span>
               <h1 *ngIf="colorgreen" style="background-color:green;width:15%">Green</h1>
               <h1 *ngIf="coloramber" style="background-color:aquamarine;width:15%">Amber</h1>
               <h1 *ngIf="colorred" style="background-color:red;width:15%">Red</h1>
             </div>
-            <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
-
-
-                 <mat-label>Model</mat-label>
-                <mat-radio-group fxLayout="row" fxLayoutGap="20px">
-                    <mat-radio-button value="Criteria">Criteria</mat-radio-button>
-                    <mat-radio-button value="Statistical">Statistical</mat-radio-button>
-                    <mat-radio-button value="Machine Learning">Machine Learning</mat-radio-button>
+            <div>
+                <mat-label>Model</mat-label>
+                <mat-radio-group name="modelSelection" fxLayout="row" class="model" fxLayoutGap="20px" [(ngModel)]="modelType">
+                    <mat-radio-button class="model" [value]="'criteria'">Criteria</mat-radio-button>
+                    <mat-radio-button class="model" [value]="'statistical'">Statistical</mat-radio-button>
+                    <mat-radio-button class="model" [value]="'machine-learning'">Machine Learning</mat-radio-button>
                 </mat-radio-group>
-
-                <span fxFlex="28%" fxHide.lt-md></span>
+            </div>
+            <div>
+                <button mat-raised-button color="primary"  (click)="getClientDetails()">Fetch Details</button>
+            </div>
+            <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
 
                 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
                     <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
@@ -42,8 +40,6 @@ Provide the details to fetch
                     <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
 
                 </table>
-
-                <span fxFlex="38%" fxHide.lt-md></span>
 
             </div>
             <div>
