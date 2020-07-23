@@ -12,7 +12,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from abc import ABCMeta, abstractmethod
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, ShuffleSplit
 pd.options.mode.chained_assignment = None
 
 class Strategy(metaclass=ABCMeta):
@@ -105,7 +105,8 @@ class SVM(Strategy):
 	def set_model(self):
 		classifier = SVC()
 		params = {'kernel' : ['poly'], 'degree' : [2, 3, 4]}
-		self.model = GridSearchCV(estimator=classifier, param_grid=params, cv=10)
+		#self.model = GridSearchCV(estimator=classifier, param_grid=params, cv=10)
+		self.model = GridSearchCV(estimator=classifier, param_grid=params, cv=ShuffleSplit(test_size=0.20, n_splits=1, random_state=0))
 		return self.model
 
 class MLP(Strategy):
@@ -115,7 +116,8 @@ class MLP(Strategy):
 	def set_model(self):
 		classifier = MLPClassifier()
 		params = {'hidden_layer_sizes' : [(100, 50 ,10)], 'max_iter' : [500], 'activation' : ['relu'], 'solver' : ['adam'], 'random_state' : [1]}
-		self.model = GridSearchCV(estimator=classifier, param_grid=params, n_jobs=-1, cv=10)
+		#self.model = GridSearchCV(estimator=classifier, param_grid=params, n_jobs=-1, cv=10)
+		self.model = GridSearchCV(estimator=classifier, param_grid=params, n_jobs=-1, cv=ShuffleSplit(test_size=0.20, n_splits=1, random_state=0))
 		return self.model
 
 class RandomForest(Strategy):
@@ -125,7 +127,8 @@ class RandomForest(Strategy):
 	def set_model(self):
 		classifier = RandomForestClassifier()
 		params = {'n_estimators' : [20, 30, 40], 'random_state' : [0]}
-		self.model = GridSearchCV(estimator=classifier, param_grid=params, cv=10)
+		#self.model = GridSearchCV(estimator=classifier, param_grid=params, cv=10)
+		self.model = GridSearchCV(estimator=classifier, param_grid=params, cv=ShuffleSplit(test_size=0.20, n_splits=1, random_state=0))
 		return self.model
 
 class GradientBoost(Strategy):
@@ -135,7 +138,8 @@ class GradientBoost(Strategy):
 	def set_model(self):
 		classifier = GradientBoostingClassifier()
 		params = {'n_estimators' : [100, 200, 50], 'random_state' : [0], 'learning_rate' : [1.0], 'max_depth' : [1, 2, 3]}
-		self.model = GridSearchCV(estimator=classifier, param_grid=params, cv=10)
+		#self.model = GridSearchCV(estimator=classifier, param_grid=params, cv=10)
+		self.model = GridSearchCV(estimator=classifier, param_grid=params, cv=ShuffleSplit(test_size=0.20, n_splits=1, random_state=0))
 		return self.model
 
 def accuracy(Strategy):
@@ -224,6 +228,7 @@ def getMLScore(loan_id, dataset="German"):
 	data.columns = data.columns.str.replace(" ", "_")
 	data = data.dropna()
 	data = data.drop(columns='Unnamed:_0')
+	#data = data.drop(14, axis=1)
 	le = LabelEncoder()
 	for val in categorical:
 	  data[val] = le.fit_transform(data[val])
@@ -233,7 +238,9 @@ def getMLScore(loan_id, dataset="German"):
 	    data[col] = (data[col].astype('float') - np.mean(data[col].astype('float')))/np.std(data[col].astype('float'))
 	#print(data.loc[loan_id,'Risk'])
 	data = data.drop('Risk', axis=1)
-
+	#data = data.drop(15, axis=1)
+	#data = data.drop(["ID", "default_payment_next_month"], axis=1)
+	#data = data.drop('class', axis=1)
 	test_row = np.array(data.iloc[int(loan_id)]).reshape(1,-1)
 	print(mod.test(test_row))
 	acc = mod.metrics()
@@ -246,7 +253,7 @@ def getMLScore(loan_id, dataset="German"):
 # German Dataset
 
 
-#getMLScore(3)
+getMLScore(3)
 
 # Taiwan Dataset
 # data = pd.read_excel('credit.xls')

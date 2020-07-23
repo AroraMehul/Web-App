@@ -18,7 +18,23 @@ export class ScorecardComponent implements OnInit {
   public dataSource = [];
   columnsToDisplay: string[] = this.displayedColumns.slice();
   totalScore = 0;
-  modelType: string = "criteria";
+  modelType: string[] = [];
+  pred = "N/A";
+  acc = "N/A";
+  stat_pred = "N/A";
+  stat_acc = "N/A";
+  isRegSelected = false;
+  stat_var_pred = "N/A";
+  stat_var_risk = "N/A";
+  isVarSelected = false;
+  stat_wl_good = "N/A";
+  stat_wl_bad = "N/A";
+  stat_pred_wl_good = "N/A";
+  stat_pred_wl_bad = "N/A";
+  isMVSelected = false;
+  criteria = false;
+  ml = false;
+  statistical = false;
 
   public scorecardObj = {
     age: [],
@@ -59,6 +75,31 @@ export class ScorecardComponent implements OnInit {
   public getStatisticalScoring(){
     const statsuccesscallback = (data) => {
       console.log(data);
+      if(data['scorecard']['method'] == "LinReg" || data['scorecard']['method'] == "PolyReg"){
+        this.isRegSelected = true;
+        this.isVarSelected = false;
+        this.isMVSelected = false;
+        this.stat_acc = data['scorecard']['prediction'];
+        this.stat_pred = data['scorecard']['color'];
+      }
+
+      if(data['scorecard']['method'] == "VaR"){
+        this.isRegSelected = false;
+        this.isVarSelected = true;
+        this.isMVSelected = false;
+        this.stat_var_risk = data['scorecard']['Risk'];
+        this.stat_var_pred = data['scorecard']['color'];
+      }
+
+      if(data['scorecard']['method'] == "MANOVA"){
+        this.isRegSelected = false;
+        this.isVarSelected = false;
+        this.isMVSelected = true;
+        this.stat_wl_good = data['scorecard']['WL_good'];
+        this.stat_wl_bad = data['scorecard']['WL_bad'];
+        this.stat_pred_wl_good = data['scorecard']['WL_test_good'];
+        this.stat_pred_wl_bad = data['scorecard']['WL_test_bad'];
+      }
     }
     this._scoreCardService.getStatScore(statsuccesscallback, this.loanId)
   }
@@ -66,19 +107,25 @@ export class ScorecardComponent implements OnInit {
   public getMLScoring(){
     const mlsuccesscallback = (data) => {
       console.log(data);
+      console.log(data['scorecard']["result"]);
+      console.log(data['scorecard']["accuracy"])
+      this.pred = data['scorecard']["result"];
+      this.acc = data['scorecard']["accuracy"];
     }
     this._scoreCardService.getMLScore(mlsuccesscallback, this.loanId)
   }
 
   public getClientDetails() {
-    console.log(this.modelType);
-    if(this.modelType == "statistical"){
+    console.log(this.ml);
+    console.log(this.statistical);
+    console.log(this.criteria);
+    if(this.statistical){
       this.getStatisticalScoring();
     }
-    if(this.modelType == "machine-learning"){
+    if(this.ml){
       this.getMLScoring();
     }
-    if(this.modelType == "criteria"){
+    if(this.criteria){
       this.errorFlag = false;
       this.colorgreen = false;
       this.coloramber = false;

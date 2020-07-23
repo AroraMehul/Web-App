@@ -18,17 +18,19 @@ Provide the details to fetch
               <h1 *ngIf="colorred" style="background-color:red;width:15%">Red</h1>
             </div>
             <div>
-                <mat-label>Model</mat-label>
-                <mat-radio-group name="modelSelection" fxLayout="row" class="model" fxLayoutGap="20px" [(ngModel)]="modelType">
-                    <mat-radio-button class="model" [value]="'criteria'">Criteria</mat-radio-button>
-                    <mat-radio-button class="model" [value]="'statistical'">Statistical</mat-radio-button>
-                    <mat-radio-button class="model" [value]="'machine-learning'">Machine Learning</mat-radio-button>
-                </mat-radio-group>
+                <mat-label>Model : </mat-label>
+                    <mat-checkbox class="model" name="modelSelection" [(ngModel)]="criteria">Rule Based</mat-checkbox>
+                    <mat-checkbox class="model" name="modelSelection" [(ngModel)]="statistical">Statistical</mat-checkbox>
+                    <mat-checkbox class="model" name="modelSelection" [(ngModel)]="ml">Machine Learning</mat-checkbox>
+                    
             </div>
             <div>
                 <button mat-raised-button color="primary"  (click)="getClientDetails()">Fetch Details</button>
             </div>
             <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+
+            <mat-tab-group mat-align-tabs="center">
+            <mat-tab label="Rule Based">
 
                 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
                     <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
@@ -40,6 +42,71 @@ Provide the details to fetch
                     <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
 
                 </table>
+            </mat-tab>
+            <mat-tab label="Statistical">
+                <div *ngIf="isRegSelected" fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Prediction</mat-label>
+                        <input readonly matInput [(ngModel)]="stat_pred" name="stat_pred" >
+                    </mat-form-field>
+                </div>
+                <div *ngIf="isRegSelected" fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Accuracy</mat-label>
+                        <input readonly matInput [(ngModel)]="stat_acc" name="stat_acc">
+                    </mat-form-field>
+                </div>
+                <div *ngIf="isVarSelected" fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Risk</mat-label>
+                        <input readonly matInput [(ngModel)]="stat_var_risk" name="stat_var_risk" >
+                    </mat-form-field>
+                </div>
+                <div *ngIf="isVarSelected" fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Prediction</mat-label>
+                        <input readonly matInput [(ngModel)]="stat_var_pred" name="stat_var_pred">
+                    </mat-form-field>
+                </div>
+                <div *ngIf="isMVSelected" fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Wilks Lambda Good</mat-label>
+                        <input readonly matInput [(ngModel)]="stat_wl_good" name="stat_wl_good" >
+                    </mat-form-field>
+                </div>
+                <div *ngIf="isMVSelected" fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Wilks Lambda Bad</mat-label>
+                        <input readonly matInput [(ngModel)]="stat_wl_bad" name="stat_wl_bad">
+                    </mat-form-field>
+                </div><div *ngIf="isMVSelected" fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Predicted Wilks Lambda Good</mat-label>
+                        <input readonly matInput [(ngModel)]="stat_pred_wl_good" name="stat_pred_wl_good" >
+                    </mat-form-field>
+                </div>
+                <div *ngIf="isMVSelected" fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Predicted Wilks Lambda Bad</mat-label>
+                        <input readonly matInput [(ngModel)]="stat_pred_wl_bad" name="stat_pred_wl_bad">
+                    </mat-form-field>
+                </div>
+            </mat-tab>
+            <mat-tab label="Machine Learning">
+                <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Prediction</mat-label>
+                        <input readonly matInput [(ngModel)]="pred" name="pred" >
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                    <mat-form-field fxFlex="48%">
+                        <mat-label>Accuracy</mat-label>
+                        <input readonly matInput [(ngModel)]="acc" name="acc">
+                    </mat-form-field>
+                </div>
+            </mat-tab>
+            </mat-tab-group>
 
             </div>
             <div>
