@@ -4,9 +4,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-import matplotlib.pyplot as plt
-from sklearn import metrics
+from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.preprocessing import OneHotEncoder
 pd.options.mode.chained_assignment = None 
 

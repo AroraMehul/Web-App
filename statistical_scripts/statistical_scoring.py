@@ -5,7 +5,6 @@ import requests
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import LabelEncoder 
 from sklearn import preprocessing
-from sklearn.utils import shuffle
 from scipy.stats import norm
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline 

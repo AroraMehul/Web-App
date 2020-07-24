@@ -43,7 +43,7 @@ def saveTheFeature():
     # feature, value, data, category, status
     data = request.json
     print(request.json['id'])
-    values = (data['feature'],data['value'],data['data'],data['category'],data['status'])
+    #values = (data['feature'],data['value'],data['data'],data['category'],data['status'])
     return saveAFeature(data['id'],data['feature'],data['value'],data['data'],data['category'],data['status'])
 
 @app.route('/feature/featureNCategory')

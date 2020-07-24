@@ -4,9 +4,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
-import matplotlib.pyplot as plt
-from sklearn import metrics
+from sklearn.metrics import confusion_matrix, accuracy_score
 pd.options.mode.chained_assignment = None 
 
 class RandomForest():

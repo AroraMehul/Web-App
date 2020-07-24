@@ -5,10 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, f1_score
-import matplotlib.pyplot as plt
-from sklearn import metrics
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import confusion_matrix, accuracy_score, f1_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from abc import ABCMeta, abstractmethod
