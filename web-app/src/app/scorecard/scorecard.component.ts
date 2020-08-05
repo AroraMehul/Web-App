@@ -111,6 +111,7 @@ export class ScorecardComponent implements OnInit {
       console.log(data['scorecard']["accuracy"])
       this.pred = data['scorecard']["result"];
       this.acc = data['scorecard']["accuracy"];
+      this.acc = Number(this.acc).toFixed(2);
     }
     this._scoreCardService.getMLScore(mlsuccesscallback, this.loanId)
   }

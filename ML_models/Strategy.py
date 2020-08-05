@@ -10,6 +10,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from abc import ABCMeta, abstractmethod
 from sklearn.model_selection import GridSearchCV, ShuffleSplit
+import pickle
+import os
 pd.options.mode.chained_assignment = None
 
 class Strategy(metaclass=ABCMeta):
@@ -140,39 +142,48 @@ class GradientBoost(Strategy):
 		return self.model
 
 def accuracy(Strategy):
-	mod_acc = {}
-	print("SVM")
-	Strategy.model = SVM(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
-	Strategy.preprocessing()
-	Strategy.train()
-	print(Strategy.metrics())
-	mod_acc[Strategy.accuracy()] = Strategy.model
+	model_name = str(Strategy.dataset) + ".pkl"
+	print("file present check", os.path.isfile(model_name)) 
+	if(os.path.isfile(model_name)):
+		Strategy.model = pickle.load(open(model_name, 'rb'))
+		Strategy.preprocessing()
+		Strategy.train()
+		print(Strategy.metrics())
+	else:
+		mod_acc = {}
+		print("SVM")
+		Strategy.model = SVM(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
+		Strategy.preprocessing()
+		Strategy.train()
+		print(Strategy.metrics())
+		mod_acc[Strategy.accuracy()] = Strategy.model
 
-	print("MLP")
-	Strategy.model = MLP(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
-	Strategy.train()
-	print(Strategy.metrics())
-	mod_acc[Strategy.accuracy()] = Strategy.model
+		print("MLP")
+		Strategy.model = MLP(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
+		Strategy.train()
+		print(Strategy.metrics())
+		mod_acc[Strategy.accuracy()] = Strategy.model
 
-	print("GB")
-	Strategy.model = GradientBoost(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
-	Strategy.train()
-	print(Strategy.metrics())
-	mod_acc[Strategy.accuracy()] = Strategy.model
+		print("GB")
+		Strategy.model = GradientBoost(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
+		Strategy.train()
+		print(Strategy.metrics())
+		mod_acc[Strategy.accuracy()] = Strategy.model
 
-	print("RF")
-	Strategy.model = RandomForest(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
-	Strategy.train()
-	print(Strategy.metrics())
-	mod_acc[Strategy.accuracy()] = Strategy.model
+		print("RF")
+		Strategy.model = RandomForest(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
+		Strategy.train()
+		print(Strategy.metrics())
+		mod_acc[Strategy.accuracy()] = Strategy.model
 
-	maxi = 0
-	for key in mod_acc.keys():
-		if(key > maxi):
-			maxi = key
-			Strategy.model = mod_acc[key]
+		maxi = 0
+		for key in mod_acc.keys():
+			if(key > maxi):
+				maxi = key
+				Strategy.model = mod_acc[key]
+		pickle.dump(Strategy.model, open(model_name, 'wb'))
+		print(mod_acc.keys())
 
-	print(mod_acc.keys())
 	return Strategy.model
 
 def explainabiltiy(Strategy):
@@ -245,46 +256,3 @@ def getMLScore(loan_id, dataset="German"):
 	scorecard = {"accuracy" : acc['accuracy'], "result" : int(mod.test(test_row)[0])}
 	print(scorecard)
 	return scorecard
-
-
-# German Dataset
-
-
-getMLScore(3)
-
-# Taiwan Dataset
-# data = pd.read_excel('credit.xls')
-# categorical = []
-# colnames = data.iloc[0]
-# data = data[1:]
-# data.columns = colnames
-
-#Australian Dataset
-# data = [i.strip().split() for i in open("./australian.dat").readlines()]
-# data = pd.DataFrame(data)
-# categorical = []
-
-#Japanese Dataset
-# data = [i.strip().split(",") for i in open("./crx.data").readlines()]
-# data = pd.DataFrame(data)
-# indices = []
-# for idx, row in data.iterrows():
-# 	if("?" in row.values):
-# 		indices.append(idx)
-# data.drop(data.index[[indices]], inplace=True)
-# categorical = [0,3,4,5,6,8,9,11,12,15]
-
-#Polish Dataset
-# year_1 = pd.read_csv('/home/mehul/Downloads/mifos_x/ML_models/data/1year.csv')
-# year_2 = pd.read_csv('/home/mehul/Downloads/mifos_x/ML_models/data/2year.csv')
-# year_3 = pd.read_csv('/home/mehul/Downloads/mifos_x/ML_models/data/3year.csv')
-# year_4 = pd.read_csv('/home/mehul/Downloads/mifos_x/ML_models/data/4year.csv')
-# year_5 = pd.read_csv('/home/mehul/Downloads/mifos_x/ML_models/data/5year.csv')
-# data = pd.concat([year_1, year_2, year_3, year_4, year_5], ignore_index=True)
-# categorical = []
-# indices = []
-# for idx, row in data.iterrows():
-# 	if("?" in row.values):
-# 		indices.append(idx)
-# data.drop(data.index[[indices]], inplace=True)
-

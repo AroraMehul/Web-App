@@ -261,26 +261,26 @@ def stat_score(loan_id):
 	r = requests.get(URL, params=None)
 	details = r.json()
 	print("Entered stat_score")
-	#try :
-	loan_details = details[str(loan_id)]
-	data = pd.DataFrame(loan_details['values'], index=[0])
-	scorecolor = loan_details['color']
-	if(loan_details['Type'] == 'VaR'):
-		print("VaR Selected")
-		output = var(data, scorecolor)
-	elif(loan_details['Type'] == 'MANOVA'):
-		print("MANOVA Selected")
-		output = manova(data, scorecolor)
-	elif(loan_details['Type'] == 'LinReg'):
-		print("Linear Regression Selected")
-		output = linear_regression(data, scorecolor)
-	elif(loan_details['Type'] == 'PolyReg'):
-		print("Polynomial Regression Selected")
-		output = polynomial_regression(data, scorecolor)
+	try :
+		loan_details = details[str(loan_id)]
+		data = pd.DataFrame(loan_details['values'], index=[0])
+		scorecolor = loan_details['color']
+		if(loan_details['Type'] == 'VaR'):
+			print("VaR Selected")
+			output = var(data, scorecolor)
+		elif(loan_details['Type'] == 'MANOVA'):
+			print("MANOVA Selected")
+			output = manova(data, scorecolor)
+		elif(loan_details['Type'] == 'LinReg'):
+			print("Linear Regression Selected")
+			output = linear_regression(data, scorecolor)
+		elif(loan_details['Type'] == 'PolyReg'):
+			print("Polynomial Regression Selected")
+			output = polynomial_regression(data, scorecolor)
 
-	return output
-	#except Exception as e :
-	#	print(e)
+		return output
+	except Exception as e :
+		print(e)
 
 
 # print("Enter Loan Id")
