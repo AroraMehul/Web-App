@@ -7,7 +7,7 @@ import { HttpRequestService } from 'app/shared/HttpRequestService';
 export class CriteriaService {
 
     constructor(private _httpService: HttpRequestService, private _router: Router) { }
-    public getCategoryFeature(successcallback){
+    public getCategoryFeature(successcallback, errorCallBack){
       let responseObject :any;
       this._httpService.getRequest(Config.getEnvironmentVariable('getFeatureCatgory'))
             .subscribe(
@@ -15,7 +15,10 @@ export class CriteriaService {
                     responseObject = data;
                     successcallback(responseObject);
                 },
-                (error) => console.log('err'),
+                (error) => {
+                    errorCallBack(error);
+                    console.log('err');
+                },
                 () => {
                     console.log('success ');
                 }
@@ -49,16 +52,20 @@ export class CriteriaService {
                 }
             );
     }
-    public readJSONfile(successcallback){
+    public readJSONfile(successcallback, errorCallBack){
       this._httpService.getRequest("/assets/json-resources/products.json").subscribe(
         (data) =>{
           successcallback(data);
         console.log(data);
         // this.products = data;
+      },
+      (error) => {
+        console.log(error);
+        errorCallBack(error);
       });
     }
 
-    public getOneCriteria(criteriaID, successcallback) {
+    public getOneCriteria(criteriaID, successcallback, errorCallBack) {
         let responseObject: any;
         const request = {
             id : criteriaID
@@ -71,7 +78,10 @@ export class CriteriaService {
                     successcallback(responseObject);
                     console.log(data);
                 },
-                (error) => console.log('err'),
+                (error) => {
+                    errorCallBack(error);
+                    console.log('err');
+                },
                 () => {
                     console.log('success ');
                 }

@@ -4,6 +4,7 @@ import { ConfigService } from "./configuration.service";
 import { Router, ActivatedRoute } from "@angular/router";
 import { FormControl, Validators } from "@angular/forms";
 import { element } from "protractor";
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 /**
  * Configuration component.
@@ -76,7 +77,7 @@ export class ConfigurationComponent implements OnInit {
   redMaxFormControl = new FormControl("", Validators.required);
   errorMsg: string;
 
-  constructor(private _configService: ConfigService, private router: Router, private route: ActivatedRoute) {}
+  constructor(private _configService: ConfigService, private router: Router, private route: ActivatedRoute, private _snackBar: MatSnackBar) {}
 
   ngOnInit() {
     let id = null;
@@ -98,6 +99,14 @@ export class ConfigurationComponent implements OnInit {
       this.configurationObj.id = id;
     }
   }
+
+  public openSnackBar(message: string) {
+    console.log(this);
+    this._snackBar.open(message, "Close", {
+      duration: 4000,
+    });
+  }
+
   checkGreenMin() {
     this.greenFormControl.setErrors(null);
     this.greenMaxFormControl.setErrors(null);
@@ -118,14 +127,19 @@ export class ConfigurationComponent implements OnInit {
       return cond;
     }
   }
+
   public readallproducts() {
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Loading, Please Refresh");
+    }
     const successcallback = (data) => {
       for (let pro of data) {
         this.productData.push(pro.name);
       }
     };
-    this._configService.readJSONfile(successcallback);
+    this._configService.readJSONfile(successcallback, errorCallBack);
   }
+
   checkGreenMax() {
     this.greenFormControl.setErrors(null);
     this.greenMaxFormControl.setErrors(null);
@@ -173,12 +187,18 @@ export class ConfigurationComponent implements OnInit {
       this.errorMsg = "All Fields are mandatory";
     }
 
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Saving file, Please try again");
+    }
     const successcallback = (data) => {
       this.router.navigate(["criteria"]);
     };
-    this._configService.saveConfig(this.configurationObj, successcallback);
+    this._configService.saveConfig(this.configurationObj, successcallback, errorCallBack);
   }
   public getFeatureCategory() {
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Uploading File, Please Check Link");
+    }
     const successcallback = (data) => {
       // this.featureData = data;
       for (let feat of data) {
@@ -192,9 +212,13 @@ export class ConfigurationComponent implements OnInit {
       // console.log(data);
       // console.log(JSON.stringify(data));
     };
-    this._configService.getCategoryFeature(successcallback);
+    this._configService.getCategoryFeature(successcallback, errorCallBack);
   }
   public async getById(id) {
+
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Loading, Please try again");
+    }
     const successcallback = (data) => {
       console.log(JSON.stringify(data));
 
@@ -210,7 +234,7 @@ export class ConfigurationComponent implements OnInit {
       this.configurationObj.ambermin = Number(data["ambermin"]);
       // this.populateGreen();
     };
-    await this._configService.getOneFeature(id, successcallback);
+    await this._configService.getOneFeature(id, successcallback, errorCallBack);
     //  this.populateGreen();
   }
 
@@ -233,67 +257,6 @@ export class ConfigurationComponent implements OnInit {
     this.populateAmberMax();
     this.populateRedMax();
   }
-
-  /**
-  populateGreenMin() {
-    if (this.minAmber.length === 0 && this.minRed.length === 0) {
-      this.minGreen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    } else {
-
-      let minAlreadyTaken = [];
-      if (this.minAmber.length > 0) {
-        for (let am of this.minAmber) {
-          minAlreadyTaken.push(am);
-        }
-      }
-
-      if (this.minRed.length > 0) {
-        for (let am of this.minRed) {
-          minAlreadyTaken.push(am);
-        }
-      }
-      this.minGreen = this.minData.filter((item) => !minAlreadyTaken.includes(item));
-    }
-  }
-*/
-  // populateGreenMax() {
-
-  //     let maxAlreadyTaken = new Set<Number>();
-  //     if (this.maxAmber.size > 0) {
-  //       for (let am of this.maxAmber.values) {
-  //         maxAlreadyTaken.push(am);
-  //       }
-  //     }
-
-  //     if (this.maxRed.size > 0) {
-  //       for (let am of this.maxRed) {
-  //         maxAlreadyTaken.push(am);
-  //       }
-  //     }
-  //     this.maxGreen = this.maxData.filter((item) => !maxAlreadyTaken.includes(item));
-
-  // }
-
-  // populateAmberMin() {
-  //   if (this.minGreen.length === 0 && this.minRed.length === 0) {
-  //     this.minGreen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  //   } else {
-
-  //     let minAlreadyTaken = [];
-  //     if (this.minGreen.length > 0) {
-  //       for (let am of this.minGreen) {
-  //         minAlreadyTaken.push(am);
-  //       }
-  //     }
-
-  //     if (this.minRed.length > 0) {
-  //       for (let am of this.minRed) {
-  //         minAlreadyTaken.push(am);
-  //       }
-  //     }
-  //     this.minAmber = this.minData.filter((item) => !minAlreadyTaken.includes(item));
-  //   }
-  // }
 
   populateAmberMax() {
     console.log("populating amber" + this.maxAmber);
@@ -327,60 +290,7 @@ export class ConfigurationComponent implements OnInit {
     }
     this.minRed = this.maxRed;
   }
-  // populateRedMin() {
-  //   if (this.minAmber.length === 0 && this.minGreen.length === 0) {
-  //     this.minGreen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  //   } else {
-  //     /**
-  //      * Else need to write the logic
-  //      */
-  //     let minAlreadyTaken = [];
-  //     if (this.minAmber.length > 0) {
-  //       for (let am of this.minAmber) {
-  //         minAlreadyTaken.push(am);
-  //       }
-  //     }
 
-  //     if (this.minGreen.length > 0) {
-  //       for (let am of this.minGreen) {
-  //         minAlreadyTaken.push(am);
-  //       }
-  //     }
-  //     this.minRed = this.minData.filter((item) => !minAlreadyTaken.includes(item));
-  //   }
-  // }
-
-  // populateRedMax() {
-  //   if (this.maxAmber.length === 0 && this.maxGreen.length === 0) {
-  //     this.maxGreen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  //   } else {
-  //     let maxAlreadyTaken = [];
-  //     if (this.maxAmber.length > 0) {
-  //       for (let am of this.maxAmber) {
-  //         maxAlreadyTaken.push(am);
-  //       }
-  //     }
-
-  //     if (this.maxGreen.length > 0) {
-  //       for (let am of this.maxGreen) {
-  //         maxAlreadyTaken.push(am);
-  //       }
-  //     }
-  //     this.maxRed = this.maxData.filter((item) => !maxAlreadyTaken.includes(item));
-  //   }
-  // }
-
-  // reCalculateMin(){
-  //   this.populateGreenMin();
-  //   this.populateAmberMin();
-  //   this.populateRedMin();
-  // }
-
-  // reCalculateMax(){
-  //   this.populateGreenMax();
-  //   this.populateAmberMax();
-  //   this.populateRedMax();
-  // }
   onGreenMinSelection() {
     console.log("Min green" + this.configurationObj.greenmin);
   }

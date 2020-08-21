@@ -8,7 +8,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import confusion_matrix, accuracy_score, f1_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from sklearn.model_selection import GridSearchCV, ShuffleSplit
 import pickle
 import os
@@ -90,7 +90,6 @@ class Strategy(metaclass=ABCMeta):
 
 	def accuracy(self):
 		y_pred = self.predict()
-		cm = confusion_matrix(y_pred, self.y_test)
 		return accuracy_score(self.y_test, y_pred, normalize=False)
 
 	def metrics(self):
@@ -191,7 +190,7 @@ def accuracy(Strategy):
 	return Strategy.model
 
 def explainabiltiy(Strategy):
-	return GradientBoost(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
+	return GradientBoost(Strategy.test_size, Strategy.data, Strategy.categorical, Strategy.config).set_model()
 
 def getMLScore(loan_id, dataset="German"):
 	config = configparser.ConfigParser()

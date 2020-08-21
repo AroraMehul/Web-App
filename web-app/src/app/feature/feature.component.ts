@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FeatureService } from './feature.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 /**
  * Create Feature Screen Component
@@ -30,7 +31,7 @@ export class FeatureComponent implements OnInit {
 
   featureForm: FormGroup;
 
-  constructor(private _featureService: FeatureService, private router: Router, private route: ActivatedRoute) {}
+  constructor(private _featureService: FeatureService, private router: Router, private route: ActivatedRoute, private _snackBar: MatSnackBar) {}
   ngOnInit() {
     let id = null;
 
@@ -54,25 +55,19 @@ export class FeatureComponent implements OnInit {
     'status' : new FormControl(this.featureObject.status, []),
     });
 
-
-
-
-
-    /**
-    let valuecallback = (valueData) => {
-      this.valueData = valueData;
-    }
-
-    this._featureService.getValueData(valuecallback);
-    this.dataData = []
-    this.categoryData =[]
-    */
     this.route.params.subscribe((params) => {
     id = params['id'];
     });
     if (id) {
       this.getById(id);
     }
+  }
+
+  public openSnackBar(message: string) {
+    console.log(this);
+    this._snackBar.open(message, "Close", {
+      duration: 4000,
+    });
   }
 
   public submitFeature() {
@@ -87,16 +82,22 @@ export class FeatureComponent implements OnInit {
       this.featureObject.dataType &&
       this.featureObject.category
     ) {
+      const errorCallBack = (data) => {
+        this.openSnackBar("Problem saving feature, Please try again !!");
+      }
       const successcallback = (data) => {
         this.router.navigate(['configuration']);
       };
-      this._featureService.saveFeature(this.featureObject, successcallback);
+      this._featureService.saveFeature(this.featureObject, successcallback, errorCallBack);
     } else {
       this.errorMsg = 'All the fields are mandatory';
     }
   }
 
   public getById(id) {
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem getting feature details, Please check and retry !!");
+    }
     const successcallback = (data) => {
       this.featureObject.category = data['category'];
       this.featureObject.dataType = data['data'];
@@ -104,9 +105,7 @@ export class FeatureComponent implements OnInit {
       this.featureObject.valueType = data['value'];
       this.featureObject.id = data['id'];
       this.featureObject.status = data['status'];
-
-      //  console.log(JSON.stringify(this.featureObject));
     };
-    this._featureService.getOneFeature(id, successcallback);
+    this._featureService.getOneFeature(id, successcallback, errorCallBack);
   }
 }

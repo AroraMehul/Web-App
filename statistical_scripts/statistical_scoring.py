@@ -3,8 +3,7 @@ import numpy as np
 import pandas as pd
 import requests
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import LabelEncoder 
-from sklearn import preprocessing
+from sklearn.preprocessing import LabelEncoder
 from scipy.stats import norm
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline 

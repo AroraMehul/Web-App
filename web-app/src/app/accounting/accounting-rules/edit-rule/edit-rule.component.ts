@@ -86,7 +86,7 @@ export class EditRuleComponent implements OnInit {
    * Sets accounting rule form for selected accounting rule type.
    */
   setAccountingRulesForm() {
-    this.accountingRuleForm.get('debitRuleType').valueChanges.subscribe(debitRuleType => {
+    this.accountingRuleForm.get('debitRuleType').valueChanges.subscribe((debitRuleType) => {
       if (debitRuleType === 'fixedAccount') {
         this.accountingRuleForm.get('debitTags').reset();
         this.accountingRuleForm.get('allowMultipleDebitEntries').reset();

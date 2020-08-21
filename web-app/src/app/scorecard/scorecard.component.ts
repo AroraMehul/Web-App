@@ -3,6 +3,7 @@ import { Component, OnInit } from "@angular/core";
 import { ScoreCardService } from "./scorecard.service";
 import { Router, ActivatedRoute } from "@angular/router";
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 /**
  * Create Scorecard Component
@@ -12,9 +13,14 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
   templateUrl: "./scorecard.component.html",
   styleUrls: ["./scorecard.component.scss"],
 })
-export class ScorecardComponent implements OnInit {
-  model = ["Criteria", "Statistical", "Machine Learning"];
 
+export class ScorecardComponent implements OnInit {
+
+/**
+ * Variable Declaration
+ */
+
+  model = ["Criteria", "Statistical", "Machine Learning"];
   displayedColumns: string[] = ["Category", "Feature", "Score", "Color"];
   public dataSource = [];
   columnsToDisplay: string[] = this.displayedColumns.slice();
@@ -57,15 +63,25 @@ export class ScorecardComponent implements OnInit {
   scoreamber = '';
   colorred = false;
   scorered = '';
-  // dataTable: [];
   loanId = "";
   file = "";
   loanValues = [];
   res = [];
 
-  constructor(private _scoreCardService: ScoreCardService, private router: Router, private route: ActivatedRoute) {}
+  constructor(private _scoreCardService: ScoreCardService, private router: Router, private route: ActivatedRoute, private _snackBar: MatSnackBar) {}
   ngOnInit() {
     this.getLoans();
+  }
+
+  /**
+   * Helper Functions
+   */
+
+  public openSnackBar(message: string) {
+    console.log(this);
+    this._snackBar.open(message, "Close", {
+      duration: 4000,
+    });
   }
 
   public getLoans() {
@@ -77,18 +93,20 @@ export class ScorecardComponent implements OnInit {
         };
         this.loanValues.push(det);
       }
-      //  console.log(JSON.stringify(data['pageItems'][0]));
     };
     this._scoreCardService.getLoan(successcallback);
   }
 
   public fileUpload() {
     console.log(this.file);
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Uploading File, Please Check Link");
+    }
     const uploadsuccesscallback = (data) => {
       console.log(data);
     }
-    this._scoreCardService.uploadCSV(uploadsuccesscallback, this.file);
-}
+    this._scoreCardService.uploadCSV(uploadsuccesscallback, this.file, errorCallBack);
+  }
 
 
   public updateColor(color: string){
@@ -126,6 +144,9 @@ export class ScorecardComponent implements OnInit {
   }
 
   public getStatisticalScoring(){
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Calculating Statistical Score, Please check loan ID");
+    }
     const statsuccesscallback = (data) => {
       console.log(data);
       if(data['scorecard']['method'] == "LinReg" || data['scorecard']['method'] == "PolyReg"){
@@ -154,10 +175,13 @@ export class ScorecardComponent implements OnInit {
         this.stat_pred_wl_bad = data['scorecard']['WL_test_bad'];
       }
     }
-    this._scoreCardService.getStatScore(statsuccesscallback, this.loanId, this.stat_model)
+    this._scoreCardService.getStatScore(statsuccesscallback, this.loanId, this.stat_model, errorCallBack);
   }
 
   public getMLScoring(){
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Calculating ML Score, Please check loan ID");
+    }
     const mlsuccesscallback = (data) => {
       console.log(data);
       console.log(data['scorecard']["result"]);
@@ -166,8 +190,13 @@ export class ScorecardComponent implements OnInit {
       this.acc = data['scorecard']["accuracy"];
       this.acc = Number(this.acc).toFixed(2);
     }
-    this._scoreCardService.getMLScore(mlsuccesscallback, this.loanId)
+    this._scoreCardService.getMLScore(mlsuccesscallback, this.loanId, errorCallBack);
   }
+
+
+/** 
+ * Compile all the scores
+ */
 
   public getClientDetails() {
     console.log(this.ml);
@@ -231,7 +260,9 @@ export class ScorecardComponent implements OnInit {
                 Color: datagen["genderColor"]
               });
               this.updateColor(datagen["genderColor"]);
-
+              const errorCallBack = (data) => {
+                this.openSnackBar(data);
+              }
               let xmlsuccesscallback = (valueData) => {
                 //data = JSON.parse(valueData)
                 console.log(valueData['scorecard']['color'][0]);
@@ -246,10 +277,7 @@ export class ScorecardComponent implements OnInit {
                   });
                   this.updateColor(valueData['scorecard']['color'][i]);
                 }
-
-                //this.dataSource = res;
                 this.totalScore = this.totalScore + count;
-                //console.log("json string", JSON.stringify(valueData), valueData);
               }
               
               let jsonsuccesscallback = (valueData) => {
@@ -269,15 +297,14 @@ export class ScorecardComponent implements OnInit {
 
                 this.dataSource = this.res;
                 this.totalScore = this.totalScore + count;
-                //console.log("json string", JSON.stringify(valueData), valueData);
               }
-              this._scoreCardService.getXmlScore(xmlsuccesscallback, this.loanId);
-              this._scoreCardService.getJsonScore(jsonsuccesscallback, this.loanId);
+              this._scoreCardService.getXmlScore(xmlsuccesscallback, this.loanId, errorCallBack);
+              this._scoreCardService.getJsonScore(jsonsuccesscallback, this.loanId, errorCallBack);
             };
 
             this._scoreCardService.getAllScore(successcallbackGen, age, gen);
           };
-          this._scoreCardService.getClientDetails(successcallback, clientId);
+          this._scoreCardService.getClientDetails(successcallback, clientId, this.openSnackBar);
         }
       }
     }

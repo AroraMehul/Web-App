@@ -8,7 +8,7 @@ export class ConfigService {
 
     constructor(private _httpService: HttpRequestService, private _router: Router) { }
 
-    public getCategoryFeature(successcallback){
+    public getCategoryFeature(successcallback, errorCallBack){
       let responseObject :any;
       this._httpService.getRequest(Config.getEnvironmentVariable('getFeatureCatgory'))
             .subscribe(
@@ -16,13 +16,15 @@ export class ConfigService {
                     responseObject = data;
                     successcallback(responseObject);
                 },
-                (error) => console.log('err'),
+                (error) => {
+                    errorCallBack(error);
+                    console.log('err');},
                 () => {
                     console.log('success ');
                 }
             );
     }
-    public saveConfig(criteriaObj, successcallback) {
+    public saveConfig(criteriaObj, successcallback, errorCallBack) {
         let responseObject: any;
         const request = {
             feature : criteriaObj.feature,
@@ -49,14 +51,16 @@ export class ConfigService {
                     responseObject = data;
                     successcallback(responseObject);
                 },
-                (error) => console.log('err'),
+                (error) => {
+                    errorCallBack(error);
+                    console.log('err');},
                 () => {
                     console.log('success ');
                 }
             );
     }
 
-    public getOneFeature(configId, successcallback) {
+    public getOneFeature(configId, successcallback, errorCallBack) {
         let responseObject: any;
         const request = {
             id : configId
@@ -69,18 +73,27 @@ export class ConfigService {
                     successcallback(responseObject);
                     console.log(JSON.stringify(data));
                 },
-                (error) => console.log('err'),
+                (error) => {
+                    errorCallBack(error);
+                    console.log('err');},
                 () => {
                     console.log('success ');
                 }
             );
     }
-    public readJSONfile(successcallback){
+    public readJSONfile(successcallback, errorCallBack){
       this._httpService.getRequest("/assets/json-resources/products.json").subscribe(
         (data) =>{
           successcallback(data);
         console.log(data);
         // this.products = data;
+      },
+      (error) => {
+        errorCallBack(error);
+        console.log(error);
+      },
+      () => {
+        console.log("Success");
       });
     }
 }

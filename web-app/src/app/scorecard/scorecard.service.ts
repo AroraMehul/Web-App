@@ -15,13 +15,13 @@ export class ScoreCardService {
           responseObject = data;
           successcallback(responseObject);
         },
-        (error) => console.log("err"),
+        (error) => console.log("error"),
         () => {
           console.log("success ");
         }
       );
   }
-  public getClientDetails(successcallback, loanId) {
+  public getClientDetails(successcallback, loanId, openSnackBar) {
     let responseObject: any;
     this._httpService
       .getRequest(
@@ -32,7 +32,9 @@ export class ScoreCardService {
           responseObject = data;
           successcallback(responseObject);
         },
-        (error) => console.log("err"),
+        (error) => {
+          openSnackBar("error");
+          console.log("error2");},
         () => {
           console.log("success ");
         }
@@ -51,14 +53,17 @@ export class ScoreCardService {
         responseObject = data;
         successcallback(responseObject);
       },
-      (error) => console.log("err"),
+      (error) => console.log("error1"),
       () => {
         console.log("success ");
       }
     );
   }
 
-  public getJsonScore(jsonsuccesscallback, loan_id) {
+/**
+ * JSON Score Extraction
+ */
+  public getJsonScore(jsonsuccesscallback, loan_id, errorCallBack) {
 
     let responseObject: any;
     let payload = {
@@ -69,14 +74,20 @@ export class ScoreCardService {
         responseObject = data;
         jsonsuccesscallback(responseObject);
       },
-      (error) => console.log(error),
+      (error) => {
+        errorCallBack(error);
+        console.log(error);},
       () => {
         console.log("success ");
       }
     );
   }
 
-  public getXmlScore(xmlsuccesscallback, loan_id) {
+/**
+ * XML Score Extraction
+ */
+
+  public getXmlScore(xmlsuccesscallback, loan_id, errorCallBack) {
 
     let responseObject: any;
     let payload = {
@@ -87,14 +98,20 @@ export class ScoreCardService {
         responseObject = data;
         xmlsuccesscallback(responseObject);
       },
-      (error) => console.log(error),
+      (error) => {
+        errorCallBack(error);
+        console.log(error);},
       () => {
         console.log("success ");
       }
     );
   }
 
-  public getStatScore(statsuccesscallback, loan_id, stat_model){
+/**
+ * Statistical Score Extraction
+ */
+
+  public getStatScore(statsuccesscallback, loan_id, stat_model, errorCallBack){
 
     let responseObject: any;
     let payload = {
@@ -106,7 +123,9 @@ export class ScoreCardService {
         responseObject = data;
         statsuccesscallback(responseObject);
       },
-      (error) => console.log(error),
+      (error) => {
+        errorCallBack(error);
+        console.log(error);},
       () => {
         console.log("success ");
       }
@@ -114,7 +133,11 @@ export class ScoreCardService {
 
   }
 
-  public getMLScore(mlsuccesscallback, loan_id){
+/**
+ * ML Score Extraction
+ */
+
+  public getMLScore(mlsuccesscallback, loan_id, errorCallBack){
 
     let responseObject: any;
     let payload = {
@@ -125,7 +148,9 @@ export class ScoreCardService {
         responseObject = data;
         mlsuccesscallback(responseObject);
       },
-      (error) => console.log(error),
+      (error) => {
+        errorCallBack(error);
+        console.log(error);},
       () => {
         console.log("success ");
       }
@@ -133,7 +158,11 @@ export class ScoreCardService {
 
   }
 
-  public uploadCSV(uploadsuccesscallback, file){
+/**
+ * CSV Upload
+ */
+
+  public uploadCSV(uploadsuccesscallback, file, errorCallBack){
 
     let responseObject: any;
     console.log("File");
@@ -146,7 +175,9 @@ export class ScoreCardService {
         responseObject = data;
         uploadsuccesscallback(responseObject);
       },
-      (error) => console.log(error),
+      (error) => {
+        errorCallBack(error);
+        console.log(error);},
       () => {
         console.log("success ");
       }

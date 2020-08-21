@@ -5,6 +5,7 @@ import { CriteriaService } from "./criteria.service";
 import { MatTableDataSource } from "@angular/material";
 import { IfStmt } from "@angular/compiler";
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 /**
  * Create Criteria Component
@@ -39,7 +40,7 @@ export class CriteriaComponent implements OnInit {
   criteriaForm: FormGroup;
 
   errorFlag: boolean;
-  constructor(private _criteriaService: CriteriaService, private router: Router, private route: ActivatedRoute) {
+  constructor(private _criteriaService: CriteriaService, private router: Router, private route: ActivatedRoute, private _snackBar: MatSnackBar) {
     /**this.criteriaObject.scoreCriteria.push({
       criteria: "",
       score: "",
@@ -89,6 +90,14 @@ export class CriteriaComponent implements OnInit {
     }
 
   }
+
+  public openSnackBar(message: string) {
+    console.log(this);
+    this._snackBar.open(message, "Close", {
+      duration: 4000,
+    });
+  }
+
   addRow() {
     let setErrorFlag = false;
     for (let sc of this.criteriaObject.scoreCriteria) {
@@ -112,14 +121,21 @@ export class CriteriaComponent implements OnInit {
   }
 
   public readallproducts() {
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Loading, Please Try Again");
+    }
+
     const successcallback = (data) => {
       for (let pro of data) {
         this.productData.push(pro.name);
       }
     };
-    this._criteriaService.readJSONfile(successcallback);
+    this._criteriaService.readJSONfile(successcallback, errorCallBack);
   }
   public getFeatureCategory() {
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Loading, Please Try Again");
+    }
     const successcallback = (data) => {
       for (let feat of data) {
         let single = {
@@ -130,7 +146,7 @@ export class CriteriaComponent implements OnInit {
         this.featureData.push(single);
       }
     };
-    this._criteriaService.getCategoryFeature(successcallback);
+    this._criteriaService.getCategoryFeature(successcallback, errorCallBack);
   }
 
   public onFeatureSelection() {
@@ -139,6 +155,9 @@ export class CriteriaComponent implements OnInit {
   }
 
   public getById(id) {
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Loading, Please Try Again");
+    }
     const successcallback = (data) => {
       console.log(data);
       this.criteriaObject.id = data['id'];
@@ -152,20 +171,14 @@ export class CriteriaComponent implements OnInit {
         this.criteriaObject.scoreCriteria.push({ criteria: data['criteria'][_i], score: data['score'][_i], id: data['id'], errorflag: false });
       }
 
-      //console.log(this.criteriaObject.id);
-      
-      //this.criteriaObject.scoreCriteria[score] = data['score'];
-
-
       if (this.criteriaObject.datasource === "SQL") {
         this.criteriaForm.get('keyvalue').disable();    
       } else {
         this.criteriaForm.get('keyvalue').enable();   
       }
-      
       console.log(JSON.stringify(this.criteriaObject));
     };
-    this._criteriaService.getOneCriteria(id, successcallback);
+    this._criteriaService.getOneCriteria(id, successcallback, errorCallBack);
   }
 
   public submitCriteria() {
@@ -174,12 +187,11 @@ export class CriteriaComponent implements OnInit {
       this.router.navigate(["scorecard"]);
     };
 
-    const errorcallback = (data) => {
-      console.log(data)
-      window.alert("Wrong query");
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Submitting, Please Try Again");
     };
     console.log(JSON.stringify(this.criteriaObject));
-    this._criteriaService.saveCriteria(this.criteriaObject, successcallback, errorcallback);
+    this._criteriaService.saveCriteria(this.criteriaObject, successcallback, errorCallBack);
 
     
     

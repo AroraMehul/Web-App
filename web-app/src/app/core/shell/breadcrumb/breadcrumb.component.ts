@@ -79,7 +79,7 @@ export class BreadcrumbComponent implements OnInit {
         let breadcrumbLabel: any;
         let url: any;
 
-        childrenRoutes.forEach(route => {
+        childrenRoutes.forEach((route) => {
           currentRoute = route;
           breadcrumbLabel = false;
 

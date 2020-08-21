@@ -7,23 +7,7 @@ export class FeatureService {
 
     constructor(private _httpService: HttpRequestService, private _router: Router) { }
 
-    public getValueData(valuecallback) {
-
-        this._httpService.getRequest('<url>').subscribe(
-        (data) => {
-            let valueDataOptions = data;
-            valuecallback(valueDataOptions);
-        },
-        (error) => {
-            let defaultValues = ["a", "b", "c"];
-            valuecallback(defaultValues);
-            console.log("err")
-        },
-        )
-
-    }
-
-    public saveFeature(featureObj, successcallback) {
+    public saveFeature(featureObj, successcallback, errorCallBack) {
         let responseObject: any;
         const request = {
             id: featureObj.id,
@@ -40,14 +24,16 @@ export class FeatureService {
                     console.log(data);
                     successcallback(responseObject);
                 },
-                (error) => {console.log(error);},
+                (error) => {
+                    errorCallBack(error);
+                    console.log(error);},
                 () => {
                     console.log('success ');
                 }
             );
     }
 
-    public getOneFeature(featureId, successcallback) {
+    public getOneFeature(featureId, successcallback, errorCallBack) {
         let responseObject: any;
         const request = {
             id : featureId
@@ -59,7 +45,9 @@ export class FeatureService {
                     responseObject = data;
                     successcallback(responseObject);
                 },
-                (error) => console.log('err'),
+                (error) => {
+                    errorCallBack(error);
+                    console.log('err');},
                 () => {
                     console.log('success ');
                 }

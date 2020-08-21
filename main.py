@@ -1,8 +1,4 @@
-from flask import Flask, jsonify, request
-import json
-from flask import Response
-import os
-import pandas as pd
+from flask import Flask, jsonify, request, Response
 import json
 import requests
 import configparser
@@ -138,15 +134,12 @@ def upload():
     print(request.json['file'])
     URL = request.json['file']
     status = True
-    try:
-        r = requests.get(URL, params=None)
-        status = r.status_code
-        if(r.status_code == 200):
-            config.set('dataset', 'location', URL)
-            with open('config.ini', 'w') as configfile:
-                config.write(configfile)
-    except Exception as e:
-        status = False
+    r = requests.get(URL, params=None)
+    status = r.status_code
+    if(r.status_code == 200):
+        config.set('dataset', 'location', URL)
+        with open('config.ini', 'w') as configfile:
+            config.write(configfile)
     return jsonify(
         status=status
     )

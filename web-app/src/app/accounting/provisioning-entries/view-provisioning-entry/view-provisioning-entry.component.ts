@@ -164,7 +164,7 @@ export class ViewProvisioningEntryComponent implements OnInit, AfterViewInit {
    * @param {string} property Property to filter data.
    */
   applyFilter(filterValue: string, property: string) {
-    this.filterValue[property] = filterValue;
+    this.filterValue[parseInt(property)] = filterValue;
     this.dataSource.filter = this.filterValue;
   }
 

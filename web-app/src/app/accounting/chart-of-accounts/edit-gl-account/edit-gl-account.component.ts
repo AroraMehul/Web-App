@@ -75,7 +75,7 @@ export class EditGlAccountComponent implements OnInit {
   setGLAccountForm() {
     this.accountTypeData = this.glAccount.accountTypeOptions;
     this.accountUsageData = this.glAccount.usageOptions;
-    this.glAccountForm.get('type').valueChanges.subscribe(accountTypeId => {
+    this.glAccountForm.get('type').valueChanges.subscribe((accountTypeId) => {
       switch (accountTypeId) {
         case 1: this.parentData = this.glAccount.assetHeaderAccountOptions;
                 this.tagData = this.glAccount.allowedAssetsTagOptions;

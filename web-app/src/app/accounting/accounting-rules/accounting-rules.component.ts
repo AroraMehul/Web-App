@@ -56,7 +56,7 @@ export class AccountingRulesComponent implements OnInit {
       switch (property) {
         case 'debitAccount': return accountingRule.debitAccounts[0].name;
         case 'creditAccount': return accountingRule.creditAccounts[0].name;
-        default: return accountingRule[property];
+        default: return accountingRule[parseInt(property)];
       }
     };
     this.dataSource.sort = this.sort;
