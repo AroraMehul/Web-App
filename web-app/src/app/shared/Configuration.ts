@@ -26,7 +26,8 @@ const SERVICE_URLS_MAP = {
     getJsonScore: 'score/calc/json',
     getXmlScore: 'score/calc/xml',
     getStatScore: 'score/calc/stat',
-    getMLScore: 'score/calc/ml'
+    getMLScore: 'score/calc/ml',
+    uploadCSV: 'upload/csv'
 
 };
 

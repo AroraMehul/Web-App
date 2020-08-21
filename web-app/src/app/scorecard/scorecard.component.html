@@ -7,6 +7,15 @@
                     <input matInput [(ngModel)]="loanId" name="loanId" >
                 </mat-form-field>
             </div>
+            <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                <mat-form-field fxFlex="48%">
+                    <mat-label>Link</mat-label>
+                    <input matInput [(ngModel)]="file" name="file" >
+                </mat-form-field>
+            </div>
+            <div>
+                <button mat-raised-button color="primary"  (click)="fileUpload()">Upload</button>
+            </div>
             <div *ngIf="errorFlag" class="errormsg">
 Provide the details to fetch
             </div>
@@ -22,6 +31,15 @@ Provide the details to fetch
                     <mat-checkbox class="model" name="modelSelection" [(ngModel)]="criteria">Rule Based</mat-checkbox>
                     <mat-checkbox class="model" name="modelSelection" [(ngModel)]="statistical">Statistical</mat-checkbox>
                     <mat-checkbox class="model" name="modelSelection" [(ngModel)]="ml">Machine Learning</mat-checkbox>
+                    
+            </div>
+             <div *ngIf="statistical" fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
+                <mat-label>Statistical Model : </mat-label>
+                    <mat-radio-group class = "stat_model" [(ngModel)] = "stat_model" name="stat_model">
+                        <mat-radio-button value="lin_reg" name="stat_model">Linear Regression </mat-radio-button><br>
+                        <mat-radio-button value="poly_reg" name= "stat_model">Polynomial Regression</mat-radio-button><br>
+                        <mat-radio-button value="manova" name= "stat_model">Manova</mat-radio-button>
+                    </mat-radio-group>
                     
             </div>
             <div>
@@ -113,12 +131,6 @@ Provide the details to fetch
               <div></div>
               <div *ngFor=""></div>
             </div>
-            <mat-card-actions fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="5px">
-                <button mat-raised-button color="accent" [routerLink]="['/scorecard']">Get</button>
-                <button type="button" mat-raised-button [routerLink]="['../']">Cancel</button>
-                <button mat-raised-button color="primary">Submit</button>
-            </mat-card-actions>
-
         </form>
     </mat-card>
 </div>

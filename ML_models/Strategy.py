@@ -12,10 +12,13 @@ from abc import ABCMeta, abstractmethod
 from sklearn.model_selection import GridSearchCV, ShuffleSplit
 import pickle
 import os
+import configparser
+import requests
+import csv
 pd.options.mode.chained_assignment = None
 
 class Strategy(metaclass=ABCMeta):
-	def __init__(self, test_size, data, categorical, dataset="German", training_strategy = None):
+	def __init__(self, test_size, data, categorical, config, dataset="German", training_strategy = None):
 		self.x = pd.DataFrame()
 		self.y = []
 		self.X_train = pd.DataFrame()
@@ -28,9 +31,10 @@ class Strategy(metaclass=ABCMeta):
 		self.model = ""
 		self.training_strategy = training_strategy
 		self.dataset = dataset
+		self.config = config
 
 	def preprocessing(self):
-		self.data.columns = self.data.columns.str.replace(" ", "_")
+		#self.data.columns = self.data.columns.str.replace(" ", "_")
 		self.data = self.data.dropna()
 		le = LabelEncoder()
 		for val in self.categorical:
@@ -41,9 +45,9 @@ class Strategy(metaclass=ABCMeta):
 		    self.data[col] = (self.data[col].astype('float') - np.mean(self.data[col].astype('float')))/np.std(self.data[col].astype('float'))
 
 		if(self.dataset == "German"):
-			self.data = self.data.drop(columns='Unnamed:_0')
-			self.x = self.data.drop('Risk', axis=1)
-			self.y = self.data['Risk'].astype('int')
+			#self.data = self.data.drop(0)
+			self.x = self.data.drop(10, axis=1)
+			self.y = self.data[10].astype('int')
 		elif(self.dataset == "Australian"):
 			self.x = self.data.drop(14, axis=1)
 			self.y = self.data[14].astype('int')
@@ -98,8 +102,8 @@ class Strategy(metaclass=ABCMeta):
 
 
 class SVM(Strategy):
-	def __init__(self, test_size, data, categorical):
-		super(SVM, self).__init__(test_size, data, categorical)
+	def __init__(self, test_size, data, categorical, config):
+		super(SVM, self).__init__(test_size, data, categorical, config)
 
 	def set_model(self):
 		classifier = SVC()
@@ -109,8 +113,8 @@ class SVM(Strategy):
 		return self.model
 
 class MLP(Strategy):
-	def __init__(self, test_size, data, categorical):
-		super(MLP, self).__init__(test_size, data, categorical)
+	def __init__(self, test_size, data, categorical, config):
+		super(MLP, self).__init__(test_size, data, categorical, config)
 
 	def set_model(self):
 		classifier = MLPClassifier()
@@ -120,8 +124,8 @@ class MLP(Strategy):
 		return self.model
 
 class RandomForest(Strategy):
-	def __init__(self, test_size, data, categorical):
-		super(RandomForest, self).__init__(test_size, data, categorical)
+	def __init__(self, test_size, data, categorical, config):
+		super(RandomForest, self).__init__(test_size, data, categorical, config)
 
 	def set_model(self):
 		classifier = RandomForestClassifier()
@@ -131,8 +135,8 @@ class RandomForest(Strategy):
 		return self.model
 
 class GradientBoost(Strategy):
-	def __init__(self, test_size, data, categorical):
-		super(GradientBoost, self).__init__(test_size, data, categorical)
+	def __init__(self, test_size, data, categorical, config):
+		super(GradientBoost, self).__init__(test_size, data, categorical, config)
 
 	def set_model(self):
 		classifier = GradientBoostingClassifier()
@@ -142,9 +146,9 @@ class GradientBoost(Strategy):
 		return self.model
 
 def accuracy(Strategy):
-	model_name = str(Strategy.dataset) + ".pkl"
-	print("file present check", os.path.isfile(model_name)) 
-	if(os.path.isfile(model_name)):
+	model_name = Strategy.config['dataset']['name']
+	print("file present check", os.path.isfile(model_name), "file change check", bool(Strategy.config['dataset']['change'])) 
+	if(bool(Strategy.config['dataset']['change']) and os.path.isfile(model_name)):
 		Strategy.model = pickle.load(open(model_name, 'rb'))
 		Strategy.preprocessing()
 		Strategy.train()
@@ -152,26 +156,26 @@ def accuracy(Strategy):
 	else:
 		mod_acc = {}
 		print("SVM")
-		Strategy.model = SVM(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
+		Strategy.model = SVM(Strategy.test_size, Strategy.data, Strategy.categorical, Strategy.config).set_model()
 		Strategy.preprocessing()
 		Strategy.train()
 		print(Strategy.metrics())
 		mod_acc[Strategy.accuracy()] = Strategy.model
 
 		print("MLP")
-		Strategy.model = MLP(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
+		Strategy.model = MLP(Strategy.test_size, Strategy.data, Strategy.categorical, Strategy.config).set_model()
 		Strategy.train()
 		print(Strategy.metrics())
 		mod_acc[Strategy.accuracy()] = Strategy.model
 
 		print("GB")
-		Strategy.model = GradientBoost(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
+		Strategy.model = GradientBoost(Strategy.test_size, Strategy.data, Strategy.categorical, Strategy.config).set_model()
 		Strategy.train()
 		print(Strategy.metrics())
 		mod_acc[Strategy.accuracy()] = Strategy.model
 
 		print("RF")
-		Strategy.model = RandomForest(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
+		Strategy.model = RandomForest(Strategy.test_size, Strategy.data, Strategy.categorical, Strategy.config).set_model()
 		Strategy.train()
 		print(Strategy.metrics())
 		mod_acc[Strategy.accuracy()] = Strategy.model
@@ -190,9 +194,23 @@ def explainabiltiy(Strategy):
 	return GradientBoost(Strategy.test_size, Strategy.data, Strategy.categorical).set_model()
 
 def getMLScore(loan_id, dataset="German"):
-	if(dataset == "German"):
-		data = pd.read_csv("/home/mehul/Downloads/datasets_9109_12699_german_credit_data.csv")
-		categorical = ['Sex', 'Housing', 'Saving_accounts', 'Checking_account', 'Purpose', 'Risk']
+	config = configparser.ConfigParser()
+	config.read('config.ini')
+	if(config['dataset']['name'] == "German"):
+		req = requests.get(config['dataset']['location'], params=None)
+		dec = req.content.decode('utf-8')
+		csv_reader = csv.reader(dec.splitlines(), delimiter=',')
+		csv_reader = list(csv_reader)
+		df = pd.DataFrame(csv_reader, columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+		data = df.drop(0)
+		#data = pd.read_csv(config['dataset']['location'])
+		cols = data.columns
+		print(cols)
+		num_cols = data._get_numeric_data().columns
+		categorical = list(set(cols) - set(num_cols))
+		# for i in range(len(categorical)) :
+		# 	categorical[i] = categorical[i].replace(" ", "_")
+		#categorical = ['Sex', 'Housing', 'Saving_accounts', 'Checking_account', 'Purpose', 'Risk']
 
 	if(dataset == "Taiwan"):
 		data = pd.read_excel('credit.xls')
@@ -230,12 +248,12 @@ def getMLScore(loan_id, dataset="German"):
 				indices.append(idx)
 		data.drop(data.index[[indices]], inplace=True)
 
-	mod = Strategy(0.2, data, categorical, dataset, training_strategy=accuracy)
+	mod = Strategy(0.2, data, categorical, config, dataset, training_strategy=accuracy)
 	mod.set_model()
 	mod.train()
-	data.columns = data.columns.str.replace(" ", "_")
+	#data.columns = data.columns.str.replace(" ", "_")
 	data = data.dropna()
-	data = data.drop(columns='Unnamed:_0')
+	#data = data.drop(0)
 	#data = data.drop(14, axis=1)
 	le = LabelEncoder()
 	for val in categorical:
@@ -245,7 +263,7 @@ def getMLScore(loan_id, dataset="German"):
 	  if(col not in categorical):
 	    data[col] = (data[col].astype('float') - np.mean(data[col].astype('float')))/np.std(data[col].astype('float'))
 	#print(data.loc[loan_id,'Risk'])
-	data = data.drop('Risk', axis=1)
+	data = data.drop(10, axis=1)
 	#data = data.drop(15, axis=1)
 	#data = data.drop(["ID", "default_payment_next_month"], axis=1)
 	#data = data.drop('class', axis=1)

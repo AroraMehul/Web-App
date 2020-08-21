@@ -1,7 +1,11 @@
 from flask import Flask, jsonify, request
 import json
 from flask import Response
-
+import os
+import pandas as pd
+import json
+import requests
+import configparser
 # from views.ConfigurationOperations import getAllConfigurationFromDB, getByConfigId, saveAConfiguration
 # from views.CriteriaOperations import getAllCriteriaFromDB, getByCriteriaId, saveCriteria
 # from views.FeatureOperations import getByFeatureId, getAllFeaturesFromDB, saveAFeature, getFeatureNCategoryFromDB
@@ -122,9 +126,29 @@ def getScoreML():
 
 @app.route('/score/calc/stat', methods=['POST'])
 def getScoreStat():
-    scorecard = stat_score(request.json['loan_id']);
+    scorecard = stat_score(request.json['loan_id'], request.json['stat_model']);
     return jsonify(
         scorecard=scorecard
+    )
+
+@app.route('/upload/csv', methods=['POST'])
+def upload():
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    print(request.json['file'])
+    URL = request.json['file']
+    status = True
+    try:
+        r = requests.get(URL, params=None)
+        status = r.status_code
+        if(r.status_code == 200):
+            config.set('dataset', 'location', URL)
+            with open('config.ini', 'w') as configfile:
+                config.write(configfile)
+    except Exception as e:
+        status = False
+    return jsonify(
+        status=status
     )
 
 # main driver function

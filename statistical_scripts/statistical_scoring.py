@@ -9,8 +9,10 @@ from scipy.stats import norm
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline 
 from statsmodels.multivariate.manova import MANOVA
+import configparser
+import csv
 
-def var(df, scorecolor):
+def var(df):
 
 	print("Entered var")
 
@@ -39,28 +41,15 @@ def var(df, scorecolor):
 
 	return {"method" : "VaR", "Risk" : "Default", "color" : "Green"}
 
-def linear_regression(input_row, scorecolor):
+def linear_regression(input_row, data, categorical):
 
 	print("Enetered Linear Regression")
-	
-	# URL = ""
-	# r = requests.get(URL, params=None)
-	# data_json = r.json()
-	# data = json.load(data_json)
-	data = pd.read_csv("/home/mehul/Downloads/datasets_9109_12699_german_credit_data.csv")
-
-	data.columns = data.columns.str.replace(" ", "_")
 
 	data = data.dropna()
-
-	data.append(input_row, sort = False)
-
-	categorical = ['Sex', 'Housing', 'Saving_accounts', 'Checking_account', 'Purpose', 'Risk']
+	data.loc[len(data)] = input_row
 	le = LabelEncoder()
 	for val in categorical:
 	  data[val] = le.fit_transform(data[val])
-
-	data = data.drop(columns='Unnamed:_0')
 	for col in data.columns:
 	  if(col not in categorical):
 	    data[col] = (data[col] - np.mean(data[col]))/np.std(data[col])
@@ -70,10 +59,10 @@ def linear_regression(input_row, scorecolor):
 	data_train = data[:split_idx]
 	data_test = data[split_idx:]
 
-	y_train = data_train['Risk']
-	x_train = data_train.loc[:, data_train.columns != 'Risk']
-	y_test = data_test['Risk']
-	x_test = data_test.loc[:, data_test.columns != 'Risk']
+	y_train = data_train[10]
+	x_train = data_train.loc[:, data_train.columns != 10]
+	y_test = data_test[10]
+	x_test = data_test.loc[:, data_test.columns != 10]
 
 	reg = LinearRegression().fit(x_train, y_train)
 
@@ -91,39 +80,24 @@ def linear_regression(input_row, scorecolor):
 			count = count + 1
 	accuracy = count/len(predictions)
 	print(accuracy)
-	for criteria in scorecolor:
-		mini, maxi = criteria.split("-")
-		if(accuracy*100 > int(mini) and accuracy*100 < int(maxi)):
-			if(predictions[len(x_test)-1] < 0.5):
-				color = "red"
-			else:
-				color = "green"
-			return {"method" : "LinReg", "color" : color, "prediction" : scorecolor[criteria]}
 
-	return "Green"
+	if(predictions[len(x_test)-1] < 0.5):
+		color = "red"
+	else:
+		color = "green"
+	
+	return {"method" : "LinReg", "color" : color, "prediction" : 100*accuracy}
 
-def polynomial_regression(input_row, scorecolor):
+def polynomial_regression(input_row, data, categorical):
 
 	print("Enetered Polynomial Regression")
-	
-	# URL = ""
-	# r = requests.get(URL, params=None)
-	# data_json = r.json()
-	# data = json.load(data_json)
-	data = pd.read_csv("/home/mehul/Downloads/datasets_9109_12699_german_credit_data.csv")
-
-	data.columns = data.columns.str.replace(" ", "_")
 
 	data = data.dropna()
-
-	data.append(input_row, sort = False)
-
-	categorical = ['Sex', 'Housing', 'Saving_accounts', 'Checking_account', 'Purpose', 'Risk']
+	data.loc[len(data)] = input_row
 	le = LabelEncoder()
 	for val in categorical:
 	  data[val] = le.fit_transform(data[val])
 
-	data = data.drop(columns='Unnamed:_0')
 	for col in data.columns:
 	  if(col not in categorical):
 	    data[col] = (data[col] - np.mean(data[col]))/np.std(data[col])
@@ -133,10 +107,10 @@ def polynomial_regression(input_row, scorecolor):
 	data_train = data[:split_idx]
 	data_test = data[split_idx:]
 
-	y_train = data_train['Risk']
-	x_train = data_train.loc[:, data_train.columns != 'Risk']
-	y_test = data_test['Risk']
-	x_test = data_test.loc[:, data_test.columns != 'Risk']
+	y_train = data_train[10]
+	x_train = data_train.loc[:, data_train.columns != 10]
+	y_test = data_test[10]
+	x_test = data_test.loc[:, data_test.columns != 10]
 
 	model = Pipeline([('poly', PolynomialFeatures(degree=2)),('linear', LinearRegression(fit_intercept=False))])
 	reg = model.fit(x_train, y_train)
@@ -156,31 +130,19 @@ def polynomial_regression(input_row, scorecolor):
 		if(y_test[i] == predictions[i]):
 			count = count + 1
 	accuracy = count/len(predictions)
+	
+	if(predictions[len(x_test)-1] < 0.5):
+		color = "red"
+	else:
+		color = "green"
+	
+	return {"method" : "PolyReg", "color" : color, "prediction" : 100*accuracy}
 
-	print(accuracy)
-	for criteria in scorecolor:
-		mini, maxi = criteria.split("-")
-		if(accuracy*100 > int(mini) and accuracy*100 < int(maxi)):
-			if(predictions[len(x_test)-1] < 0.5):
-				color = "red"
-			else:
-				color = "green"
-			return {"method" : "PolyReg", "color" : color, "prediction" : scorecolor[criteria]}
+def manova(test_row, data, categorical):
 
-	return "Green"
-
-def manova(test_row, scorecolor):
-
-	url = "/home/mehul/Downloads/datasets_9109_12699_german_credit_data.csv"
-	data = pd.read_csv(url, index_col=0)
-	data.columns = data.columns.str.replace(" ", "_")
-
-	data.columns = data.columns.str.replace(" ", "_")
 	data = data.dropna()
+	data.loc[len(data)] = test_row
 
-	data.append(test_row, sort=False)
-
-	categorical = ['Sex', 'Housing', 'Saving_accounts', 'Checking_account', 'Purpose', 'Risk']
 	le = LabelEncoder()
 	for val in categorical:
 	  data[val] = le.fit_transform(data[val])
@@ -193,13 +155,13 @@ def manova(test_row, scorecolor):
 	test_row = data.iloc[len(data)-1]
 	data.drop([len(data)-1])
 
-	data_good = data[data['Risk'] == 0]
-	data_bad = data[data['Risk'] == 1]
+	data_good = data[data[10] == 0]
+	data_bad = data[data[10] == 1]
 
-	x_good = data_good.drop(['Risk', 'Credit_amount'], axis = 1)
-	y_good = data_good[['Credit_amount']]
-	x_bad = data_bad.drop(['Risk', 'Credit_amount'], axis = 1)
-	y_bad = data_bad[['Credit_amount']]
+	x_good = data_good.drop([10, 9], axis = 1)
+	y_good = data_good[[9]]
+	x_bad = data_bad.drop([10, 9], axis = 1)
+	y_bad = data_bad[[9]]
 
 	man_good = MANOVA(endog=x_good, exog=y_good)
 	man_bad = MANOVA(endog=x_bad, exog=y_bad)
@@ -220,8 +182,8 @@ def manova(test_row, scorecolor):
 	HT_bad = out_bad[2][0]
 	RGR_bad = out_bad[3][0]
 
-	x = test_row.drop(['Risk', 'Credit_amount'])
-	y = test_row[['Credit_amount']]
+	x = test_row.drop([10, 9])
+	y = test_row[[9]]
 
 	data_test_x = x_good.append(x)
 	data_test_y = y_good.append(y)
@@ -256,27 +218,34 @@ def manova(test_row, scorecolor):
 	return scorecard
 
 
-def stat_score(loan_id):
-	URL = "https://raw.githubusercontent.com/humbletechy/Assign/master/statistical.json"
-	r = requests.get(URL, params=None)
-	details = r.json()
+def stat_score(loan_id, model_type):
+	print(model_type)
+	config = configparser.ConfigParser()
+	config.read('config.ini')
+	req = requests.get(config['dataset']['location'], params=None)
+	dec = req.content.decode('utf-8')
+	csv_reader = csv.reader(dec.splitlines(), delimiter=',')
+	csv_reader = list(csv_reader)
+	df = pd.DataFrame(csv_reader, columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+	data = df.drop(0)
+	cols = data.columns
+	num_cols = data._get_numeric_data().columns
+	categorical = list(set(cols) - set(num_cols))
 	print("Entered stat_score")
 	try :
-		loan_details = details[str(loan_id)]
-		data = pd.DataFrame(loan_details['values'], index=[0])
-		scorecolor = loan_details['color']
-		if(loan_details['Type'] == 'VaR'):
+		input_row = data.iloc[int(loan_id)]
+		if(model_type == 'var'):
 			print("VaR Selected")
-			output = var(data, scorecolor)
-		elif(loan_details['Type'] == 'MANOVA'):
+			#output = var(data, scorecolor)
+		elif(model_type == 'manova'):
 			print("MANOVA Selected")
-			output = manova(data, scorecolor)
-		elif(loan_details['Type'] == 'LinReg'):
+			output = manova(input_row, data, categorical)
+		elif(model_type == 'lin_reg'):
 			print("Linear Regression Selected")
-			output = linear_regression(data, scorecolor)
-		elif(loan_details['Type'] == 'PolyReg'):
+			output = linear_regression(input_row, data, categorical)
+		elif(model_type == 'poly_reg'):
 			print("Polynomial Regression Selected")
-			output = polynomial_regression(data, scorecolor)
+			output = polynomial_regression(input_row, data, categorical)
 
 		return output
 	except Exception as e :

@@ -2,6 +2,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ScoreCardService } from "./scorecard.service";
 import { Router, ActivatedRoute } from "@angular/router";
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
 
 /**
  * Create Scorecard Component
@@ -35,6 +36,13 @@ export class ScorecardComponent implements OnInit {
   criteria = false;
   ml = false;
   statistical = false;
+  count_red = 0;
+  count_green = 0;
+  count_amber = 0;
+  lin_reg = false;
+  poly_reg = false;
+  manova = false;
+  stat_model = "";
 
   public scorecardObj = {
     age: [],
@@ -51,7 +59,9 @@ export class ScorecardComponent implements OnInit {
   scorered = '';
   // dataTable: [];
   loanId = "";
+  file = "";
   loanValues = [];
+  res = [];
 
   constructor(private _scoreCardService: ScoreCardService, private router: Router, private route: ActivatedRoute) {}
   ngOnInit() {
@@ -70,6 +80,49 @@ export class ScorecardComponent implements OnInit {
       //  console.log(JSON.stringify(data['pageItems'][0]));
     };
     this._scoreCardService.getLoan(successcallback);
+  }
+
+  public fileUpload() {
+    console.log(this.file);
+    const uploadsuccesscallback = (data) => {
+      console.log(data);
+    }
+    this._scoreCardService.uploadCSV(uploadsuccesscallback, this.file);
+}
+
+
+  public updateColor(color: string){
+    if(color == 'green'){
+      this.count_green = this.count_green + 1;
+    }
+    if(color == 'amber'){
+      this.count_amber = this.count_amber + 1;
+    }
+    if(color == 'red'){
+      this.count_red = this.count_red + 1;
+    }
+    if(this.count_green >= this.count_amber){
+      this.colorgreen = false;
+      this.coloramber = true;
+      this.colorred = false;
+    }
+    if(this.count_green > this.count_amber){
+      this.colorgreen = true;
+      this.coloramber = false;
+      this.colorred = false;
+    }
+    if(this.count_green + this.count_amber >= this.count_red){
+      this.colorgreen = false;
+      this.coloramber = true;
+      this.colorred = false;
+    }
+    if(this.count_red >= this.count_amber && this.count_red >= this.count_green){
+      this.colorgreen = false;
+      this.coloramber = false;
+      this.colorred = true;
+    }
+    console.log("Green Count");
+    console.log(this.count_green);
   }
 
   public getStatisticalScoring(){
@@ -101,7 +154,7 @@ export class ScorecardComponent implements OnInit {
         this.stat_pred_wl_bad = data['scorecard']['WL_test_bad'];
       }
     }
-    this._scoreCardService.getStatScore(statsuccesscallback, this.loanId)
+    this._scoreCardService.getStatScore(statsuccesscallback, this.loanId, this.stat_model)
   }
 
   public getMLScoring(){
@@ -121,6 +174,7 @@ export class ScorecardComponent implements OnInit {
     console.log(this.statistical);
     console.log(this.criteria);
     if(this.statistical){
+      console.log(this.stat_model);
       this.getStatisticalScoring();
     }
     if(this.ml){
@@ -160,21 +214,23 @@ export class ScorecardComponent implements OnInit {
             }
             console.log("GENDER", gen)
             const successcallbackGen = (datagen) => {
-              let res = [];
               console.log(datagen["genderScore"])
               this.totalScore = Number(datagen["ageScore"]) + Number(datagen["genderScore"]);
-              res.push({
+              this.res.push({
                 Category: "Individual",
                 Feature: " Age",
                 Score: datagen["ageScore"],
                 Color: datagen["ageColor"]
               });
-              res.push({
+              this.updateColor(datagen["ageColor"]);
+
+              this.res.push({
                 Category: "Individual",
                 Feature: " Gender",
                 Score: datagen["genderScore"],
                 Color: datagen["genderColor"]
               });
+              this.updateColor(datagen["genderColor"]);
 
               let xmlsuccesscallback = (valueData) => {
                 //data = JSON.parse(valueData)
@@ -182,12 +238,13 @@ export class ScorecardComponent implements OnInit {
                 var count = 0;
                 for(var i = 0; i < valueData['scorecard']['color'].length ; i++){
                   count = count + Number(valueData['scorecard']['score'][i])
-                  res.push({
+                  this.res.push({
                   Category: valueData['scorecard']['category'][i],
                   Feature: valueData['scorecard']['feature'][i],
                   Score: valueData['scorecard']['score'][i],
                   Color: valueData['scorecard']['color'][i]
                   });
+                  this.updateColor(valueData['scorecard']['color'][i]);
                 }
 
                 //this.dataSource = res;
@@ -201,15 +258,16 @@ export class ScorecardComponent implements OnInit {
                 var count = 0;
                 for(var i = 0; i < valueData['scorecard']['color'].length ; i++){
                   count = count + Number(valueData['scorecard']['score'][i])
-                  res.push({
+                  this.res.push({
                   Category: valueData['scorecard']['category'][i],
                   Feature: valueData['scorecard']['feature'][i],
                   Score: valueData['scorecard']['score'][i],
                   Color: valueData['scorecard']['color'][i]
                   });
+                  this.updateColor(valueData['scorecard']['color'][i]);
                 }
 
-                this.dataSource = res;
+                this.dataSource = this.res;
                 this.totalScore = this.totalScore + count;
                 //console.log("json string", JSON.stringify(valueData), valueData);
               }

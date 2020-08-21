@@ -8,7 +8,6 @@ import { map } from 'rxjs/operators';
 export class HttpRequestService {
   constructor(private http: Http) { }
   public getRequest(urlPath: string): Observable<any> {
-
     const _headers = new Headers({ 'Content-type': 'application/json' ,  'Authorization': 'Basic ' + btoa('mifos:password')});
     const options = new RequestOptions({ headers: _headers });
     return this.http.get(urlPath, options)

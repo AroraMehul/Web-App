@@ -94,11 +94,12 @@ export class ScoreCardService {
     );
   }
 
-  public getStatScore(statsuccesscallback, loan_id){
+  public getStatScore(statsuccesscallback, loan_id, stat_model){
 
     let responseObject: any;
     let payload = {
-      loan_id
+      loan_id,
+      stat_model
     }
     this._httpService.postRequest(Config.getEnvironmentVariable("getStatScore"), payload).subscribe(
       (data) => {
@@ -123,6 +124,27 @@ export class ScoreCardService {
       (data) => {
         responseObject = data;
         mlsuccesscallback(responseObject);
+      },
+      (error) => console.log(error),
+      () => {
+        console.log("success ");
+      }
+    );
+
+  }
+
+  public uploadCSV(uploadsuccesscallback, file){
+
+    let responseObject: any;
+    console.log("File");
+    console.log(file);
+    let payload = {
+      file
+    }
+    this._httpService.postRequest(Config.getEnvironmentVariable("uploadCSV"), payload).subscribe(
+      (data) => {
+        responseObject = data;
+        uploadsuccesscallback(responseObject);
       },
       (error) => console.log(error),
       () => {
