@@ -12,7 +12,7 @@ from scorecard_backend.views.ConfigurationOperations import getAllConfigurationF
 from scorecard_backend.views.CriteriaOperations import getAllCriteriaFromDB, getByCriteriaId, saveCriteria
 from scorecard_backend.views.FeatureOperations import getByFeatureId, getAllFeaturesFromDB, getFeatureNCategoryFromDB, \
     saveAFeature
-from scorecard_backend.views.ScorecardOperations import getByAge, getByGender, getByJSON, getByXML
+from scorecard_backend.views.ScorecardOperations import getByAge, getByGender, getByJSON, getByXML, getBySQL
 from ML_models.Strategy import getMLScore
 from statistical_scripts.statistical_scoring import stat_score 
 
@@ -94,6 +94,13 @@ def getCriteriaScore():
 @app.route('/score/calc/json', methods=['POST'])
 def getCriteriaScoreJSON():
     scorecard = getByJSON(request.json['loan_id']);
+    return jsonify(
+        scorecard=scorecard
+    )
+
+@app.route('/score/calc/sql', methods=['POST'])
+def getCriteriaScoreSQL():
+    scorecard = getBySQL(request.json['loan_id']);
     return jsonify(
         scorecard=scorecard
     )

@@ -185,5 +185,24 @@ export class ScoreCardService {
 
   }
 
+  public getRBScore(rbsuccesscallback, loan_id, errorCallBack){
+    let responseObject: any;
+    let payload = {
+      loan_id
+    }
+    this._httpService.postRequest(Config.getEnvironmentVariable("getRBScore"), payload).subscribe(
+      (data) => {
+        responseObject = data;
+        rbsuccesscallback(responseObject);
+      },
+      (error) => {
+        errorCallBack(error);
+        console.log(error);},
+      () => {
+        console.log("success ");
+      }
+    );
+  }
+
 
 }

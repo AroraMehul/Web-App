@@ -27,6 +27,7 @@ const SERVICE_URLS_MAP = {
     getXmlScore: 'score/calc/xml',
     getStatScore: 'score/calc/stat',
     getMLScore: 'score/calc/ml',
+    getRBScore: '/score/calc/sql',
     uploadCSV: 'upload/csv'
 
 };

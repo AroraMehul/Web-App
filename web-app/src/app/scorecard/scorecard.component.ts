@@ -193,6 +193,23 @@ export class ScorecardComponent implements OnInit {
     this._scoreCardService.getMLScore(mlsuccesscallback, this.loanId, errorCallBack);
   }
 
+  public getRBScoring(){
+    const errorCallBack = (data) => {
+      this.openSnackBar("Problem Calculating RB Score, Please check loan ID");
+    }
+    console.log("RB");
+    const rbsuccesscallback = (data) => {
+      this.res.push({
+        Category: data['scorecard']['category'],
+        Feature: data['scorecard']['feature'],
+        Score: data['scorecard']['score'],
+        Color: data['scorecard']['color']
+        });
+      console.log(data);
+    }
+    this._scoreCardService.getRBScore(rbsuccesscallback, this.loanId, errorCallBack);
+  }
+
 
 /** 
  * Compile all the scores
@@ -210,6 +227,7 @@ export class ScorecardComponent implements OnInit {
       this.getMLScoring();
     }
     if(this.criteria){
+      this.getRBScoring();
       this.errorFlag = false;
       this.colorgreen = false;
       this.coloramber = false;
@@ -260,53 +278,52 @@ export class ScorecardComponent implements OnInit {
                 Color: datagen["genderColor"]
               });
               this.updateColor(datagen["genderColor"]);
-              const errorCallBack = (data) => {
-                this.openSnackBar(data);
-              }
-              let xmlsuccesscallback = (valueData) => {
-                //data = JSON.parse(valueData)
-                console.log(valueData['scorecard']['color'][0]);
-                var count = 0;
-                for(var i = 0; i < valueData['scorecard']['color'].length ; i++){
-                  count = count + Number(valueData['scorecard']['score'][i])
-                  this.res.push({
-                  Category: valueData['scorecard']['category'][i],
-                  Feature: valueData['scorecard']['feature'][i],
-                  Score: valueData['scorecard']['score'][i],
-                  Color: valueData['scorecard']['color'][i]
-                  });
-                  this.updateColor(valueData['scorecard']['color'][i]);
-                }
-                this.totalScore = this.totalScore + count;
-              }
-              
-              let jsonsuccesscallback = (valueData) => {
-                //data = JSON.parse(valueData)
-                console.log(valueData['scorecard']['color'][0]);
-                var count = 0;
-                for(var i = 0; i < valueData['scorecard']['color'].length ; i++){
-                  count = count + Number(valueData['scorecard']['score'][i])
-                  this.res.push({
-                  Category: valueData['scorecard']['category'][i],
-                  Feature: valueData['scorecard']['feature'][i],
-                  Score: valueData['scorecard']['score'][i],
-                  Color: valueData['scorecard']['color'][i]
-                  });
-                  this.updateColor(valueData['scorecard']['color'][i]);
-                }
-
-                this.dataSource = this.res;
-                this.totalScore = this.totalScore + count;
-              }
-              this._scoreCardService.getXmlScore(xmlsuccesscallback, this.loanId, errorCallBack);
-              this._scoreCardService.getJsonScore(jsonsuccesscallback, this.loanId, errorCallBack);
             };
-
             this._scoreCardService.getAllScore(successcallbackGen, age, gen);
           };
           this._scoreCardService.getClientDetails(successcallback, clientId, this.openSnackBar);
         }
       }
+      const errorCallBack = (data) => {
+        this.openSnackBar(data);
+      }
+      let xmlsuccesscallback = (valueData) => {
+        //data = JSON.parse(valueData)
+        console.log(valueData['scorecard']['color'][0]);
+        var count = 0;
+        for(var i = 0; i < valueData['scorecard']['color'].length ; i++){
+          count = count + Number(valueData['scorecard']['score'][i])
+          this.res.push({
+          Category: valueData['scorecard']['category'][i],
+          Feature: valueData['scorecard']['feature'][i],
+          Score: valueData['scorecard']['score'][i],
+          Color: valueData['scorecard']['color'][i]
+          });
+          this.updateColor(valueData['scorecard']['color'][i]);
+        }
+        this.totalScore = this.totalScore + count;
+      }
+      
+      let jsonsuccesscallback = (valueData) => {
+        //data = JSON.parse(valueData)
+        console.log(valueData['scorecard']['color'][0]);
+        var count = 0;
+        for(var i = 0; i < valueData['scorecard']['color'].length ; i++){
+          count = count + Number(valueData['scorecard']['score'][i])
+          this.res.push({
+          Category: valueData['scorecard']['category'][i],
+          Feature: valueData['scorecard']['feature'][i],
+          Score: valueData['scorecard']['score'][i],
+          Color: valueData['scorecard']['color'][i]
+          });
+          this.updateColor(valueData['scorecard']['color'][i]);
+        }
+
+        this.dataSource = this.res;
+        this.totalScore = this.totalScore + count;
+      }
+      this._scoreCardService.getXmlScore(xmlsuccesscallback, this.loanId, errorCallBack);
+      this._scoreCardService.getJsonScore(jsonsuccesscallback, this.loanId, errorCallBack);
     }
   }
 }
