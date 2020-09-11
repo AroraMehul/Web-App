@@ -58,6 +58,8 @@ The application is using the demo server with basic authentication by default. T
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
+Run `ng serve --host 0.0.0.0` for a dev server on a VPS. Navigate to `http://vpsexternalIPaddress:4200/`. The app will automatically reload if you change any of the source files.
+
 ### Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use
