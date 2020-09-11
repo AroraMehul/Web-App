@@ -24,7 +24,10 @@ git clone https://github.com/humbletechy/Web-App
 
 4. `cd` into project root directory (cd into folder web-app folder) and make sure you are on the master branch.
 
-5. For Windows users, while in `web-app` folder make sure you delete file named `package-lock.json` as this will hinder progress on next step run this command `rm -r package-lock.json`
+5. For Windows users, while in web-app folder make sure you delete file named "package-lock.json" as this will hinder progress on next step run this command 
+```
+rm -r package-lock.json
+```
 
 6. Install the dependencies.
 ```
@@ -36,7 +39,6 @@ Under System Environment Variables, set the path to npm and angular using exampl
 
 C:\Users\USERACOUNT\AppData\Roaming\npm
 C:\Users\USERACOUNT\AppData\Roaming\npm\node_modules\@angular\cli
-
 ```
 
 8. To preview the app, run the following command and navigate to `http://localhost:4200/`.
