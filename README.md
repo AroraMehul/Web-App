@@ -33,6 +33,7 @@ rm -r package-lock.json
 ```
 npm install
 ```
+
 7. For windows users before the next step make sure your environment variables are well set or else you will get an error `ng: command not found` 
 ```
 Under System Environment Variables, set the path to npm and angular using examples below
@@ -44,6 +45,11 @@ C:\Users\USERACOUNT\AppData\Roaming\npm\node_modules\@angular\cli
 8. To preview the app, run the following command and navigate to `http://localhost:4200/`.
 ```
 ng serve
+```
+
+9. To preview the app, on a cloud VPS run the following command and navigate to `http://domainname or externalIp:4200`.
+```
+Run `ng serve --host 0.0.0.0` 
 ```
 
 The application is using the demo server with basic authentication by default. The credentials for the same are:
