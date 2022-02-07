@@ -22,7 +22,7 @@ npm install -g @angular/cli@7.3.9
 git clone https://github.com/humbletechy/Web-App
 ```
 
-4. `cd` into project root directory (cd into folder web-app folder) and make sure you are on the master branch.
+4. `cd` into **web-app** folder and make sure you are on the master branch.
 
 5. For Windows users, while in web-app folder make sure you delete file named "package-lock.json" as this will hinder progress on next step run this command 
 ```
