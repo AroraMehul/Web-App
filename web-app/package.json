@@ -46,6 +46,8 @@
     "core-js": "2.5.7",
     "hammerjs": "2.0.8",
     "lodash": "4.17.19",
+    "remark-lint-list-item-indent": "^2.0.1",
+    "remark-stringify": "^8.1.1",
     "rxjs": "6.2.1",
     "rxjs-compat": "^6.5.2",
     "zone.js": "0.8.26"
